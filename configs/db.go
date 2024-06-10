@@ -3,6 +3,7 @@ package configs
 import (
 	"context"
 	"fmt"
+	//"github.com/Eng21072546/API_maketing/controller"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -47,11 +48,14 @@ func main() {
 // context.CancelFunc will be used to cancel context and
 // resource associated with it.
 
+var Ctx context.Context
+var Cancel context.CancelFunc
+var Client *mongo.Client
+var Err error
+
 func Close(client *mongo.Client, ctx context.Context,
 	cancel context.CancelFunc) {
-
 	defer cancel()
-
 	defer func() {
 		if err := client.Disconnect(ctx); err != nil {
 			panic(err)
@@ -61,8 +65,23 @@ func Close(client *mongo.Client, ctx context.Context,
 
 func Connect(uri string) (*mongo.Client, context.Context, context.CancelFunc, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(),
+	Ctx, Cancel = context.WithTimeout(context.Background(),
 		30*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
-	return client, ctx, cancel, err
+	Client, Err = mongo.Connect(Ctx, options.Client().ApplyURI(uri))
+	//controller.Init() //init parameter in controller
+	return Client, Ctx, Cancel, Err
 }
+
+//// Get config parameter
+//func GetCtx() context.Context {
+//	return ctx
+//}
+//func GetCancle() context.CancelFunc {
+//	return cancel
+//}
+//func GetClient() *mongo.Client {
+//	return client
+//}
+//func GetErr() error {
+//	return err
+//}

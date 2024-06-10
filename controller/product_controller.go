@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"github.com/Eng21072546/API_maketing/configs"
+	"context"
 	"github.com/Eng21072546/API_maketing/models"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	//"context"
 	"fmt"
-	//"github.com/Eng21072546/API_maketing/configs"
+	"github.com/Eng21072546/API_maketing/configs"
 	"github.com/Eng21072546/API_maketing/response"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,7 +17,22 @@ import (
 	//"time"
 )
 
-//----------------------------------------------------------------
+var ctx context.Context
+var cancel context.CancelFunc
+var client *mongo.Client
+var err error
+
+func Init() {
+	ctx = configs.Ctx
+	cancel = configs.Cancel
+	client = configs.Client
+	err = configs.Err
+	if err != nil {
+		fmt.Println(err)
+	}
+	//defer cancel()
+	//defer client.Disconnect(ctx)
+}
 
 func GetallProducts(c *fiber.Ctx) error {
 	products, err := response.Queryall()
@@ -27,6 +42,7 @@ func GetallProducts(c *fiber.Ctx) error {
 	}
 	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }
+
 func GetaProduct(c *fiber.Ctx) error {
 	// 1. Get product ID from the request path (adjust based on your API design)
 	idStr := c.Params("id")
@@ -34,12 +50,11 @@ func GetaProduct(c *fiber.Ctx) error {
 	fmt.Sscan(idStr, &id) // Convert string ID to int
 
 	// 2. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
-	client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	defer cancel()
-	defer client.Disconnect(ctx)
+	//defer cancel()
+	//defer client.Disconnect(ctx)
 
 	// 3. Build the filter to find the product by ID
 	filter := bson.M{"id": id}
@@ -67,13 +82,13 @@ func CreateProduct(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 	}
 
-	// 2. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
-	client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-	defer cancel()
-	defer client.Disconnect(ctx)
+	//// 2. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
+	//client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
+	//if err != nil {
+	//	return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	//}
+	//defer cancel()
+	//defer client.Disconnect(ctx)
 
 	// 3. Insert the product into the database
 	collection := client.Database("market").Collection("product")
@@ -98,13 +113,13 @@ func UpdateProduct(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 	}
 
-	// 3. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
-	client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-	defer cancel()
-	defer client.Disconnect(ctx)
+	//// 3. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
+	//client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
+	//if err != nil {
+	//	return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	//}
+	//defer cancel()
+	//defer client.Disconnect(ctx)
 
 	// 4. Build the update filter and document
 	filter := bson.M{"id": id}
@@ -141,12 +156,12 @@ func DeleteProduct(c *fiber.Ctx) error {
 	fmt.Sscan(productId, &id) // Convert string ID to int
 
 	// 2. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
-	client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-	defer cancel()
-	defer client.Disconnect(ctx)
+	//client, ctx, cancel, err := configs.Connect("mongodb://localhost:27017")
+	//if err != nil {
+	//	return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	//}
+	//defer cancel()
+	//defer client.Disconnect(ctx)
 
 	// 3. Build the delete filter
 	filter := bson.M{"id": id}
