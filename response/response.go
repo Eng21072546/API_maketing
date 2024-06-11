@@ -10,45 +10,26 @@ import (
 	//"time"
 )
 
-// insertOne is a user defined method, used to insert
-// documents into collection returns result of InsertOne
-// and error if any.
 func InsertOne(client *mongo.Client, ctx context.Context, dataBase, col string, doc interface{}) (*mongo.InsertOneResult, error) {
 
-	// select database and collection ith Client.Database method
-	// and Database.Collection method
 	collection := client.Database(dataBase).Collection(col)
 
-	// InsertOne accept two argument of type Context
-	// and of empty interface
 	result, err := collection.InsertOne(ctx, doc)
 	return result, err
 }
 
-// insertMany is a user defined method, used to insert
-// documents into collection returns result of
-// InsertMany and error if any.
 func InsertMany(client *mongo.Client, ctx context.Context, dataBase, col string, docs []interface{}) (*mongo.InsertManyResult, error) {
 
-	// select database and collection ith Client.Database
-	// method and Database.Collection method
 	collection := client.Database(dataBase).Collection(col)
 
-	// InsertMany accept two argument of type Context
-	// and of empty interface
 	result, err := collection.InsertMany(ctx, docs)
 	return result, err
 }
 
-// query method returns a cursor and error.
 func Query(client *mongo.Client, ctx context.Context, dataBase, col string, query, field interface{}) (result *mongo.Cursor, err error) {
 
-	// select database and collection.
 	collection := client.Database(dataBase).Collection(col)
 
-	// collection has an method Find,
-	// that returns a mongo.cursor
-	// based on query and field.
 	result, err = collection.Find(ctx, query, options.Find().SetProjection(field))
 	return
 }
@@ -65,7 +46,7 @@ func testInsert() {
 
 	// Release resource when main function is returned.
 	// defer close(client,ctx)
-	// Create  a object of type interface to  store
+	// Create a object of type interface to  store
 	// the bson values, that  we are inserting into database.
 	var document interface{}
 
@@ -174,9 +155,6 @@ func Queryall() ([]map[string]interface{}, error) {
 	//}
 	// printing the result of query.
 	fmt.Println("Query Result")
-	for _, doc := range results {
-		fmt.Println(doc)
-	}
 	products = convertBSONToMaps(results)
 	defer cursor.Close(ctx) // Close the cursor after the function finishes
 

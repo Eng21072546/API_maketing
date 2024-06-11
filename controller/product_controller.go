@@ -23,6 +23,7 @@ var client *mongo.Client
 var err error
 
 func Init() {
+	fmt.Printf("Init product controller varable")
 	ctx = configs.Ctx
 	cancel = configs.Cancel
 	client = configs.Client
@@ -32,9 +33,11 @@ func Init() {
 	}
 	//defer cancel()
 	//defer client.Disconnect(ctx)
+	fmt.Printf("----------")
 }
 
 func GetallProducts(c *fiber.Ctx) error {
+	fmt.Printf("Get all products")
 	products, err := response.Queryall()
 	if err != nil {
 		// Handle error (e.g., return error response)
@@ -44,6 +47,7 @@ func GetallProducts(c *fiber.Ctx) error {
 }
 
 func GetaProduct(c *fiber.Ctx) error {
+	fmt.Printf("Get a product")
 	// 1. Get product ID from the request path (adjust based on your API design)
 	idStr := c.Params("id")
 	var id int
@@ -75,6 +79,7 @@ func GetaProduct(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(product)
 }
 func CreateProduct(c *fiber.Ctx) error {
+	fmt.Printf("Create a product")
 	// 1. Parse the request body
 	var product models.Product
 	err := c.BodyParser(&product)
@@ -101,6 +106,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(product)
 }
 func UpdateProduct(c *fiber.Ctx) error {
+	fmt.Printf("Update a product")
 	// 1. Get product ID from the request path (adjust based on your API design)
 	productId := c.Params("id")
 	var id int
@@ -150,6 +156,7 @@ func UpdateProduct(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(updatedProduct)
 }
 func DeleteProduct(c *fiber.Ctx) error {
+	fmt.Printf("Delete a product")
 	// 1. Get product ID from the request path (adjust based on your API design)
 	productId := c.Params("id")
 	var id int
