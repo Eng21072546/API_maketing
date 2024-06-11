@@ -25,7 +25,7 @@ func Close(client *mongo.Client, ctx context.Context,
 func Connect(uri string) (*mongo.Client, context.Context, context.CancelFunc, error) {
 
 	Ctx, Cancel = context.WithTimeout(context.Background(),
-		30*time.Second)
+		120*time.Second)
 	Client, Err = mongo.Connect(Ctx, options.Client().ApplyURI(uri))
 	//controller.Init() //init parameter in controller
 	return Client, Ctx, Cancel, Err

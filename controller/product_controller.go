@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/Eng21072546/API_maketing/models"
 	"go.mongodb.org/mongo-driver/mongo"
-
 	//"context"
 	"fmt"
 	"github.com/Eng21072546/API_maketing/configs"
@@ -33,7 +32,6 @@ func Init() {
 	}
 	//defer cancel()
 	//defer client.Disconnect(ctx)
-	fmt.Printf("----------")
 }
 
 func GetallProducts(c *fiber.Ctx) error {
