@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/models"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
+var order models.Order
+
 func CreateOrder(c *fiber.Ctx) error {
-	var order models.Order
 
 	// Extract user name (assuming it's sent in the request body)
 	if err := c.BodyParser(&order); err != nil {
@@ -39,4 +42,21 @@ func CreateOrder(c *fiber.Ctx) error {
 		return err // Handle insertion errors
 	}
 	return c.Status(http.StatusCreated).JSON(fiber.Map{"order": order}, "orderconfirm")
+}
+
+func GetOrder(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	var id int
+	fmt.Sscan(idStr, &id) // Convert string ID to int
+	filter := bson.M{"id": id}
+	collection := client.Database("market").Collection("order")
+	err := collection.FindOne(ctx, filter).Decode(&order)
+	if err != nil {
+		// Handle "not found" error differently
+		if err == mongo.ErrNoDocuments {
+			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "product not found"})
+		}
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(http.StatusOK).JSON(fiber.Map{"order": order}, "order request")
 }
