@@ -5,7 +5,6 @@ import (
 	"github.com/Eng21072546/API_maketing/models"
 	"github.com/Eng21072546/API_maketing/response"
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
 	"net/http"
@@ -63,9 +62,7 @@ func GetOrder(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	var id int
 	fmt.Sscan(idStr, &id) // Convert string ID to int
-	filter := bson.M{"id": id}
-	collection := client.Database("market").Collection("order")
-	err := collection.FindOne(ctx, filter).Decode(&order)
+	order, err := response.GetOrder(ctx, client, id)
 	if err != nil {
 		// Handle "not found" error differently
 		if err == mongo.ErrNoDocuments {
@@ -74,4 +71,42 @@ func GetOrder(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.Status(http.StatusOK).JSON(fiber.Map{"order": order}, "order request")
+}
+
+func UpdateStatus(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	var id int
+	fmt.Sscan(idStr, &id)
+	order, err := response.GetOrder(ctx, client, id)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "order not found"})
+		}
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	currStatus := order.Status
+	var newStatus models.Status
+	if currStatus == models.New {
+		newStatus = models.Paid
+	} else if currStatus == models.Paid {
+		newStatus = models.Processing
+	} else if currStatus == models.Processing {
+		newStatus = models.Done
+	} else {
+		newStatus = models.Done
+	}
+	err = response.PatchOrderStatus(ctx, client, id, newStatus)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	order, err = response.GetOrder(ctx, client, id)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "order not found"})
+		}
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	fmt.Println("Order ID %d confrim ", order.ID, " Status --> ", order.Status)
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{"order": order})
 }

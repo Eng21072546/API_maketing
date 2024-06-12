@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Eng21072546/API_maketing/configs"
+	"github.com/Eng21072546/API_maketing/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -211,4 +212,37 @@ func CheckStock(ctx context.Context, collection *mongo.Collection, productID int
 
 	// 5. If all good, return true and nil error
 	return true, nil
+}
+
+func PatchOrderStatus(ctx context.Context, client *mongo.Client, orderID int, newStatus models.Status) (err error) {
+	// Access the collection for orders
+	collection := client.Database("market").Collection("order")
+
+	// Build the filter to identify the order
+	filter := bson.M{"id": bson.M{"$eq": orderID}} // Replace "_id" if your order uses a different identifier
+
+	// Update document with the new status
+	update := bson.M{"$set": bson.M{"status": newStatus}}
+
+	// Update the order status
+	_, err = collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err // Handle errors appropriately (e.g., logging, returning specific error codes)
+	}
+
+	return nil // Indicate successful update
+}
+
+func GetOrder(ctx context.Context, client *mongo.Client, orderID int) (models.Order, error) {
+	var order models.Order
+	filter := bson.M{"id": orderID}
+	collection := client.Database("market").Collection("order")
+	err := collection.FindOne(ctx, filter).Decode(&order)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Order{}, fmt.Errorf("order with ID %d not found", orderID)
+		}
+		return models.Order{}, err
+	}
+	return order, nil
 }

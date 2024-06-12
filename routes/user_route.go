@@ -12,8 +12,9 @@ func UserRoute() {
 	app.Get("/product/:id", controller.GetaProduct)
 	app.Put("/product/:id", controller.UpdateProduct)
 	app.Delete("/product/:id", controller.DeleteProduct)
-	app.Post("/orders", controller.CreateOrder)
-	app.Get("/orders/:id", controller.GetOrder)
+	app.Post("/order", controller.CreateOrder)
+	app.Get("/order/:id", controller.GetOrder)
+	app.Patch("/order/status/:id", controller.UpdateStatus)
 	//app.Get("/", func(c *fiber.Ctx) error { return c.SendString("hello") })
 	app.Listen(":6000")
 
