@@ -183,7 +183,6 @@ func DeleteProduct(c *fiber.Ctx) error {
 	if deleteResult.DeletedCount == 0 {
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "product not found"})
 	}
-
 	// 6. Send a successful response (consider returning a success message or no content)
 	return c.Status(http.StatusNoContent).JSON(fiber.Map{"Delete": productId}) // No content (204)
 }

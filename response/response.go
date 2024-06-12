@@ -174,21 +174,24 @@ func convertBSONToMaps(documents []bson.D) []map[string]interface{} {
 }
 
 func CheckStock(ctx context.Context, collection *mongo.Collection, productID int, quantity int) (bool, error) {
-	client, ctx, _, err := configs.Connect("mongodb://localhost:27017")
-	if err != nil {
-		panic(err)
+	//client, ctx, _, err := configs.Connect("mongodb://localhost:27017")
+	//if err != nil {
+	//	panic(err)
+	//}
+	var result struct {
+		DesiredField int `bson:"stock"` // Replace with actual field name and type
 	}
-
-	var filter, projection interface{}
+	var filter interface{}
 	// 1. Build the filter to find the product by ID
 	filter = bson.M{"id": productID}
 
 	// 2. Project only the "stock" field (optional, improve performance)
-	projection = bson.D{{"$project", bson.M{"id": 0, "stock": 1}}} // Project only "stock" field
+	//projection := bson.D{{"project", bson.M{"id": 0, "stock": 1}}} // Replace "desiredField" with your actual field name
+	// Use FindOne instead of Find
 
-	// 3. Find the product in the database
-	var result bson.M
-	cusor, err := Query(client, ctx, "market", "product", filter, projection)
+	err := collection.FindOne(ctx, filter).Decode(&result)
+
+	// Access the retrieved value in the "result" map using "desiredField" key
 	//Query(client, ctx, "market", "product", filter, projection)
 	//collection.FindOne(ctx, filter, options.Find().SetProjection(&projection)).Decode(&result)
 	if err != nil {
@@ -197,12 +200,11 @@ func CheckStock(ctx context.Context, collection *mongo.Collection, productID int
 		}
 		return false, fmt.Errorf("error finding product: %w", err)
 	}
-	cusor.Decode(&result)
 	// 4. Check if stock is available and sufficient
-	stock, ok := result["stock"].(int)
-	if !ok {
-		return false, fmt.Errorf("invalid stock value for product ID %d", productID)
-	}
+	stock := result.DesiredField
+	//if !ok {
+	//	return false, fmt.Errorf("invalid stock value for product ID %d", productID)
+	//}
 	if stock < quantity {
 		return false, fmt.Errorf("insufficient stock for product ID %d, only %d available", productID, stock)
 	}
