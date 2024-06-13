@@ -173,3 +173,23 @@ func DeleteProduct(c *fiber.Ctx) error {
 	// 6. Send a successful response (consider returning a success message or no content)
 	return c.Status(http.StatusNoContent).JSON(fiber.Map{"Delete": productId}) // No content (204)
 }
+
+func PatchStock(c *fiber.Ctx) error {
+	productId := c.Params("id")
+	var id int
+	fmt.Sscan(productId, &id)
+	var product models.Product
+	err := c.BodyParser(&product)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
+	}
+	err = response.UpdateStock(id, product.Stock)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	product, err = response.GetProduct(id)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(http.StatusOK).JSON(product)
+}

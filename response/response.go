@@ -244,7 +244,7 @@ func PatchOrderStatus(ctx context.Context, client *mongo.Client, orderID int, ne
 	return nil // Indicate successful update
 }
 
-func PatchStock(productID int, quantity int) error {
+func UpdateStock(productID int, quantity int) error {
 	collection := client.Database("market").Collection("product")
 	filter := bson.M{"id": productID}
 	update := bson.M{"$set": bson.M{"stock": quantity}}
@@ -287,7 +287,7 @@ func DecreeaseStock(order models.Order) error {
 		product, _ := GetProduct(productOrder.ProductID)
 		currenStock := product.Stock
 		newStock := currenStock - productOrder.Quantity
-		err := PatchStock(productOrder.ProductID, newStock)
+		err := UpdateStock(productOrder.ProductID, newStock)
 		if err != nil {
 			return err
 		}
