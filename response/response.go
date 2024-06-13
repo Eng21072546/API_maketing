@@ -173,6 +173,16 @@ func convertBSONToMaps(documents []bson.D) []map[string]interface{} {
 	}
 	return results
 }
+func GetProduct(ctx context.Context, client *mongo.Client, productID int) (models.Product, error) {
+	var product models.Product
+	filter := bson.M{"id": productID}
+	collection := client.Database("market").Collection("product")
+	err := collection.FindOne(ctx, filter).Decode(&product)
+	if err != nil {
+		return models.Product{}, err
+	}
+	return product, nil
+}
 
 func CheckStock(ctx context.Context, collection *mongo.Collection, productID int, quantity int) (bool, error) {
 	//client, ctx, _, err := configs.Connect("mongodb://localhost:27017")

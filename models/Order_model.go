@@ -12,3 +12,7 @@ type ProductOrder struct {
 	ProductID int `json:"productId"`
 	Quantity  int `json:"quantity"`
 }
+
+func CalculateOrderPrice() {
+
+}

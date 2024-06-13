@@ -14,3 +14,11 @@ func CheckAddress(order Order) error {
 	}
 	return nil
 }
+
+func LogisticCost(order Order) (float64, error) {
+	err := CheckAddress(order)
+	if err != nil {
+		return 0, err
+	}
+	return logisticPrice[order.Address], nil
+}

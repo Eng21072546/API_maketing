@@ -45,37 +45,24 @@ func GetallProducts(c *fiber.Ctx) error {
 }
 
 func GetaProduct(c *fiber.Ctx) error {
-	fmt.Printf("Get a product")
-	// 1. Get product ID from the request path (adjust based on your API design)
 	idStr := c.Params("id")
 	var id int
 	fmt.Sscan(idStr, &id) // Convert string ID to int
 
-	// 2. Connect to MongoDB (assuming you have a Connect function defined elsewhere)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	//defer cancel()
-	//defer client.Disconnect(ctx)
-
-	// 3. Build the filter to find the product by ID
-	filter := bson.M{"id": id}
-
-	// 4. Find the product in the database
-	collection := client.Database("market").Collection("product")
-	var product models.Product
-	err = collection.FindOne(ctx, filter).Decode(&product)
-	if err != nil {
-		// Handle "not found" error differently
+	product, err := response.GetProduct(ctx, client, id)
+	if err != nil { // Handle "not found" error differently
 		if err == mongo.ErrNoDocuments {
 			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "product not found"})
 		}
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-
-	// 5. Send a successful response with the product
+	fmt.Println("Get a product")
 	return c.Status(http.StatusOK).JSON(product)
 }
+
 func CreateProduct(c *fiber.Ctx) error {
 	fmt.Printf("Create a product")
 	// 1. Parse the request body
