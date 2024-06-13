@@ -52,7 +52,7 @@ func GetaProduct(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	product, err := response.GetProduct(ctx, client, id)
+	product, err := response.GetProduct(id)
 	if err != nil { // Handle "not found" error differently
 		if err == mongo.ErrNoDocuments {
 			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "product not found"})

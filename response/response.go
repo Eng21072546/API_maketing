@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"strconv"
 	//"time"
 )
 
@@ -173,7 +174,7 @@ func convertBSONToMaps(documents []bson.D) []map[string]interface{} {
 	}
 	return results
 }
-func GetProduct(ctx context.Context, client *mongo.Client, productID int) (models.Product, error) {
+func GetProduct(productID int) (models.Product, error) {
 	var product models.Product
 	filter := bson.M{"id": productID}
 	collection := client.Database("market").Collection("product")
@@ -255,4 +256,17 @@ func GetOrder(ctx context.Context, client *mongo.Client, orderID int) (models.Or
 		return models.Order{}, err
 	}
 	return order, nil
+}
+func CalculateOrderPrice(order models.Order) float64 {
+	var totalPrice float64
+	var bill []string
+	logisticPrice, _ := models.LogisticCost(order)
+	totalPrice += logisticPrice
+	for _, productOrder := range order.ProductList {
+		product, _ := GetProduct(productOrder.ProductID)
+		productPrice := product.Price * float64(productOrder.Quantity)
+		bill = append(bill, product.Name, " ", strconv.FormatFloat(product.Price, 'f', 2, 64), "  ", string(productOrder.Quantity), " ", strconv.FormatFloat(productPrice, 'f', 2, 64))
+		totalPrice += productPrice
+	}
+	return totalPrice
 }

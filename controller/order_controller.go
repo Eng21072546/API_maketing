@@ -98,7 +98,7 @@ func UpdateStatus(c *fiber.Ctx) error {
 	} else {
 		newStatus = models.Done
 	}
-	err = response.PatchOrderStatus(ctx, client, id, newStatus)
+	err = response.PatchOrderStatus(ctx, client, id, newStatus) //update status
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -112,4 +112,19 @@ func UpdateStatus(c *fiber.Ctx) error {
 	fmt.Println("Order ID %d confrim ", order.ID, " Status --> ", order.Status)
 
 	return c.Status(http.StatusOK).JSON(fiber.Map{"order": order})
+}
+
+func GetOrderPrice(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	var id int
+	fmt.Sscan(idStr, &id)
+	order, err := response.GetOrder(ctx, client, id)
+	if err != nil {
+		// Handle "not found" error differently
+		if err == mongo.ErrNoDocuments {
+			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "order not found"})
+		}
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(http.StatusOK).JSON(fiber.Map{"total price": response.CalculateOrderPrice(order)})
 }
