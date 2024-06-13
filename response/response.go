@@ -244,6 +244,17 @@ func PatchOrderStatus(ctx context.Context, client *mongo.Client, orderID int, ne
 	return nil // Indicate successful update
 }
 
+func PatchStock(productID int, quantity int) error {
+	collection := client.Database("market").Collection("product")
+	filter := bson.M{"id": productID}
+	update := bson.M{"$set": bson.M{"stock": quantity}}
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetOrder(ctx context.Context, client *mongo.Client, orderID int) (models.Order, error) {
 	var order models.Order
 	filter := bson.M{"id": orderID}
@@ -269,4 +280,17 @@ func CalculateOrderPrice(order models.Order) float64 {
 		totalPrice += productPrice
 	}
 	return totalPrice
+}
+
+func DecreeaseStock(order models.Order) error {
+	for _, productOrder := range order.ProductList {
+		product, _ := GetProduct(productOrder.ProductID)
+		currenStock := product.Stock
+		newStock := currenStock - productOrder.Quantity
+		err := PatchStock(productOrder.ProductID, newStock)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
