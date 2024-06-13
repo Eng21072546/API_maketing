@@ -23,7 +23,10 @@ func CreateOrder(c *fiber.Ctx) error {
 	// Alternatively, extract user name from authentication context (if using oIDC)
 	// user := c.Locals("user").(*oidc.UserInfo) // Assuming user info is stored in "user" context key
 	// order.CustomerName = user.PreferredUsername
-
+	//Check Address
+	if err := models.CheckAddress(order); err != nil {
+		errList = append(errList, err.Error())
+	}
 	// Generate a random order ID (replace with a more robust ID generation mechanism if needed)
 	rand.Seed(time.Now().UnixNano())
 	order.ID = rand.Intn(100000) // Example format
