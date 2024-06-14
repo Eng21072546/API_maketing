@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"context"
 	"github.com/Eng21072546/API_maketing/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
@@ -9,7 +8,6 @@ import (
 
 	//"context"
 	"fmt"
-	"github.com/Eng21072546/API_maketing/configs"
 	"github.com/Eng21072546/API_maketing/response"
 	"github.com/gofiber/fiber/v2"
 	//"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,41 +16,20 @@ import (
 	//"time"
 )
 
-var ctx context.Context
-var cancel context.CancelFunc
-var client *mongo.Client
-var err error
-
-func Init() {
-	fmt.Printf("Init product controller varable")
-	ctx = configs.Ctx
-	cancel = configs.Cancel
-	client = configs.Client
-	err = configs.Err
-	if err != nil {
-		fmt.Println(err)
-	}
-	//defer cancel()
-	//defer client.Disconnect(ctx)
-}
-
-func GetallProducts(c *fiber.Ctx) error {
+func GetProducts(c *fiber.Ctx) error {
 	fmt.Printf("Get all products")
-	products, err := response.Queryall()
+	productsList, err := response.GetAllProduct()
 	if err != nil {
 		// Handle error (e.g., return error response)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": productsList})
 }
 
 func GetaProduct(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	var id int
 	fmt.Sscan(idStr, &id) // Convert string ID to int
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
 	product, err := response.GetProduct(id)
 	if err != nil { // Handle "not found" error differently
 		if err == mongo.ErrNoDocuments {

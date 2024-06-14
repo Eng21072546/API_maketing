@@ -8,7 +8,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"math/rand"
 	"strconv"
+	"time"
 	//"time"
 )
 
@@ -122,9 +124,7 @@ func Queryall() ([]map[string]interface{}, error) {
 	if err != nil {
 		panic(err)
 	}
-
 	var filter, option interface{}
-
 	filter = bson.D{
 		// {"maths", bson.D{{"$gt", "*"}}},
 		{},
@@ -191,6 +191,21 @@ func GetProduct(productID int) (models.Product, error) {
 	return product, nil
 }
 
+func GetAllProduct() (products []models.Product, err error) {
+	var productsList []models.Product
+	collection := client.Database("market").Collection("product")
+	cursor, err := collection.Find(context.Background(), bson.M{}) // Empty bson.M{} matches all documents
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+	err = cursor.All(context.Background(), &productsList)
+	if err != nil {
+		return nil, err
+	}
+	return productsList, nil
+}
+
 func UpdateProduct(id int, productUpdates models.ProductUpdate) (*mongo.UpdateResult, error) {
 
 	filter := bson.M{"id": id}
@@ -214,7 +229,7 @@ func DeleteProduct(id int) (*mongo.DeleteResult, error) {
 	}
 	return deleteResult, nil
 }
-func CheckStock(ctx context.Context, collection *mongo.Collection, productID int, quantity int) (bool, error) {
+func CheckStock(productID int, quantity int) (bool, error) {
 	//client, ctx, _, err := configs.Connect("mongodb://localhost:27017")
 	//if err != nil {
 	//	panic(err)
@@ -226,6 +241,7 @@ func CheckStock(ctx context.Context, collection *mongo.Collection, productID int
 	// 1. Build the filter to find the product by ID
 	filter = bson.M{"id": productID}
 
+	collection := client.Database("market").Collection("product")
 	// 2. Project only the "stock" field (optional, improve performance)
 	//projection := bson.D{{"project", bson.M{"id": 0, "stock": 1}}} // Replace "desiredField" with your actual field name
 	// Use FindOne instead of Find
@@ -254,7 +270,7 @@ func CheckStock(ctx context.Context, collection *mongo.Collection, productID int
 	return true, nil
 }
 
-func PatchOrderStatus(ctx context.Context, client *mongo.Client, orderID int, newStatus models.Status) (err error) {
+func PatchOrderStatus(orderID int, newStatus models.Status) (err error) {
 	// Access the collection for orders
 	collection := client.Database("market").Collection("order")
 
@@ -284,7 +300,7 @@ func UpdateStock(productID int, quantity int) error {
 	return nil
 }
 
-func GetOrder(ctx context.Context, client *mongo.Client, orderID int) (models.Order, error) {
+func GetOrder(orderID int) (models.Order, error) {
 	var order models.Order
 	filter := bson.M{"id": orderID}
 	collection := client.Database("market").Collection("order")
@@ -322,4 +338,44 @@ func DecreaseStock(order models.Order) error {
 		}
 	}
 	return nil
+}
+
+func CreateOrder(order models.Order) (models.Order, []string) {
+	var errList []string
+	err := models.CheckAddress(order)
+	if err != nil {
+		errList = append(errList, err.Error())
+	}
+	// Generate a random order ID (replace with a more robust ID generation mechanism if needed)
+	rand.Seed(time.Now().UnixNano())
+	order.ID = rand.Intn(100000)
+
+	// Validate product availability in future (implementation not shown here)
+	for _, productorder := range order.ProductList {
+		bool, err := CheckStock(productorder.ProductID, productorder.Quantity)
+		if bool != true {
+			fmt.Println(err)
+			errorMessage := err.Error()             // Convert err to string
+			errList = append(errList, errorMessage) // Append string to errList
+		}
+	}
+	if len(errList) != 0 {
+		//fmt.Println(len(errList))
+		fmt.Println("Order ID %d NOT confrim", order.ID)
+		return order, errList
+	} else {
+
+		var status = models.New
+		// Set order status (optional)
+		order.Status = status //Enum
+		//fmt.Println("Order Status %s", status)
+		collection := client.Database("market").Collection("order")
+		// Insert order into MongoDB
+		_, err = collection.InsertOne(ctx, order)
+		if err != nil {
+			return order, errList // Handle insertion errors
+		}
+	}
+
+	return order, nil
 }
