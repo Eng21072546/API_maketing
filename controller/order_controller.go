@@ -90,7 +90,7 @@ func UpdateStatus(c *fiber.Ctx) error {
 	currStatus := order.Status
 	var newStatus models.Status
 	if currStatus == models.New {
-		err := response.DecreeaseStock(order) // Decrease stock when
+		err := response.DecreaseStock(order) // Decrease stock when
 		if err != nil {
 			return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}

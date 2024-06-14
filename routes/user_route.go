@@ -8,9 +8,9 @@ import (
 func UserRoute() {
 	app := fiber.New()
 	app.Get("/product", controller.GetallProducts)
-	app.Post("/product", controller.CreateProduct)
+	app.Post("/product", controller.PostProduct)
 	app.Get("/product/:id", controller.GetaProduct)
-	app.Put("/product/:id", controller.UpdateProduct)
+	app.Put("/product/:id", controller.PutProduct)
 	app.Delete("/product/:id", controller.DeleteProduct)
 	app.Post("/order", controller.CreateOrder)
 	app.Get("/order/:id", controller.GetOrder)

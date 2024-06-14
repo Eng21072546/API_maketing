@@ -13,17 +13,13 @@ import (
 )
 
 func InsertOne(client *mongo.Client, ctx context.Context, dataBase, col string, doc interface{}) (*mongo.InsertOneResult, error) {
-
 	collection := client.Database(dataBase).Collection(col)
-
 	result, err := collection.InsertOne(ctx, doc)
 	return result, err
 }
 
 func InsertMany(client *mongo.Client, ctx context.Context, dataBase, col string, docs []interface{}) (*mongo.InsertManyResult, error) {
-
 	collection := client.Database(dataBase).Collection(col)
-
 	result, err := collection.InsertMany(ctx, docs)
 	return result, err
 }
@@ -174,6 +170,16 @@ func convertBSONToMaps(documents []bson.D) []map[string]interface{} {
 	}
 	return results
 }
+
+func CreateProduct(product models.Product) (*mongo.InsertOneResult, error) {
+	collection := client.Database("market").Collection("product")
+	result, err := collection.InsertOne(ctx, product)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
+}
+
 func GetProduct(productID int) (models.Product, error) {
 	var product models.Product
 	filter := bson.M{"id": productID}
@@ -185,6 +191,29 @@ func GetProduct(productID int) (models.Product, error) {
 	return product, nil
 }
 
+func UpdateProduct(id int, productUpdates models.ProductUpdate) (*mongo.UpdateResult, error) {
+
+	filter := bson.M{"id": id}
+	update := bson.D{{"$set", productUpdates}} // Update specific fields
+	// 5. Update the product in the database
+	collection := client.Database("market").Collection("product")
+	updateResult, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return updateResult, err
+	}
+	return updateResult, nil
+}
+
+func DeleteProduct(id int) (*mongo.DeleteResult, error) {
+
+	filter := bson.M{"id": id}
+	collection := client.Database("market").Collection("product")
+	deleteResult, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return deleteResult, err
+	}
+	return deleteResult, nil
+}
 func CheckStock(ctx context.Context, collection *mongo.Collection, productID int, quantity int) (bool, error) {
 	//client, ctx, _, err := configs.Connect("mongodb://localhost:27017")
 	//if err != nil {
@@ -282,7 +311,7 @@ func CalculateOrderPrice(order models.Order) float64 {
 	return totalPrice
 }
 
-func DecreeaseStock(order models.Order) error {
+func DecreaseStock(order models.Order) error {
 	for _, productOrder := range order.ProductList {
 		product, _ := GetProduct(productOrder.ProductID)
 		currenStock := product.Stock
