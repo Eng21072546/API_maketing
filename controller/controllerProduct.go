@@ -17,12 +17,13 @@ import (
 )
 
 func GetProducts(c *fiber.Ctx) error {
-	fmt.Printf("Get all products")
+
 	productsList, err := response.GetAllProduct()
 	if err != nil {
 		// Handle error (e.g., return error response)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
+	fmt.Println("Get all products")
 	return c.Status(http.StatusOK).JSON(fiber.Map{"data": productsList})
 }
 
@@ -102,7 +103,7 @@ func DeleteProduct(c *fiber.Ctx) error {
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "product not found"})
 	}
 	fmt.Println("Delete a product")
-	return c.Status(http.StatusNoContent).JSON(fiber.Map{"deleted": productId}) // No content (204)
+	return c.Status(http.StatusOK).JSON(fiber.Map{"deleted": deleteResult}) // No content (204)
 }
 
 func PatchStock(c *fiber.Ctx) error {
