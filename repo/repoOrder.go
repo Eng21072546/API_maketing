@@ -1,4 +1,4 @@
-package response
+package repo
 
 import (
 	"fmt"

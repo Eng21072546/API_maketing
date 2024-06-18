@@ -39,7 +39,7 @@ func getProduct(w http.ResponseWriter, r *http.Request) {
 		// Convert "id" to integer and handle potential errors
 		itemID, err := strconv.Atoi(id)
 		if err != nil {
-			// Handle error: invalid id format, return appropriate error response
+			// Handle error: invalid id format, return appropriate error repo
 			http.Error(w, "Invalid product ID format", http.StatusBadRequest)
 			return
 		}

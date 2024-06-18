@@ -1,4 +1,4 @@
-package response
+package repo
 
 import (
 	"context"
@@ -21,6 +21,5 @@ func Init() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	//defer cancel()
-	//defer client.Disconnect(ctx)
+
 }
