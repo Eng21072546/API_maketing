@@ -2,14 +2,14 @@ package controller
 
 import (
 	"fmt"
-	"github.com/Eng21072546/API_maketing/models"
+	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/repo"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 )
 
-var order models.Order
+var order entity.Order
 
 func CreateOrder(c *fiber.Ctx) error {
 
@@ -51,19 +51,19 @@ func UpdateStatus(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 	currStatus := order.Status
-	var newStatus models.Status
-	if currStatus == models.New {
+	var newStatus entity.Status
+	if currStatus == entity.New {
 		err := repo.DecreaseStock(order) // Decrease stock when
 		if err != nil {
 			return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
-		newStatus = models.Paid
-	} else if currStatus == models.Paid {
-		newStatus = models.Processing
-	} else if currStatus == models.Processing {
-		newStatus = models.Done
+		newStatus = entity.Paid
+	} else if currStatus == entity.Paid {
+		newStatus = entity.Processing
+	} else if currStatus == entity.Processing {
+		newStatus = entity.Done
 	} else {
-		newStatus = models.Done
+		newStatus = entity.Done
 	}
 	err = repo.PatchOrderStatus(id, newStatus) //update status
 	if err != nil {

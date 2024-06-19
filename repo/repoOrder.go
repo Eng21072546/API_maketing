@@ -2,7 +2,7 @@ package repo
 
 import (
 	"fmt"
-	"github.com/Eng21072546/API_maketing/models"
+	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
@@ -11,7 +11,7 @@ import (
 	//"time"
 )
 
-func PatchOrderStatus(orderID int, newStatus models.Status) (err error) {
+func PatchOrderStatus(orderID int, newStatus entity.Status) (err error) {
 	// Access the collection for orders
 	collection := client.Database("market").Collection("order")
 
@@ -30,23 +30,23 @@ func PatchOrderStatus(orderID int, newStatus models.Status) (err error) {
 	return nil // Indicate successful update
 }
 
-func GetOrder(orderID int) (models.Order, error) {
-	var order models.Order
+func GetOrder(orderID int) (entity.Order, error) {
+	var order entity.Order
 	filter := bson.M{"id": orderID}
 	collection := client.Database("market").Collection("order")
 	err := collection.FindOne(ctx, filter).Decode(&order)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return models.Order{}, fmt.Errorf("order with ID %d not found", orderID)
+			return entity.Order{}, fmt.Errorf("order with ID %d not found", orderID)
 		}
-		return models.Order{}, err
+		return entity.Order{}, err
 	}
 	return order, nil
 }
-func CalculateOrderPrice(order models.Order) float64 {
+func CalculateOrderPrice(order entity.Order) float64 {
 	var totalPrice float64
 	var bill []string
-	logisticPrice, _ := models.LogisticCost(order)
+	logisticPrice, _ := entity.LogisticCost(order)
 	totalPrice += logisticPrice
 	for _, productOrder := range order.ProductList {
 		product, _ := GetProduct(productOrder.ProductID)
@@ -57,7 +57,7 @@ func CalculateOrderPrice(order models.Order) float64 {
 	return totalPrice
 }
 
-func DecreaseStock(order models.Order) error {
+func DecreaseStock(order entity.Order) error {
 	for _, productOrder := range order.ProductList {
 		product, _ := GetProduct(productOrder.ProductID)
 		currenStock := product.Stock
@@ -70,9 +70,9 @@ func DecreaseStock(order models.Order) error {
 	return nil
 }
 
-func CreateOrder(order models.Order) (models.Order, []string) {
+func CreateOrder(order entity.Order) (entity.Order, []string) {
 	var errList []string
-	err := models.CheckAddress(order)
+	err := entity.CheckAddress(order)
 	if err != nil {
 		errList = append(errList, err.Error())
 	}
@@ -93,7 +93,7 @@ func CreateOrder(order models.Order) (models.Order, []string) {
 		fmt.Println("Order ID %d NOT confrim", order.ID)
 		return order, errList
 	} else {
-		var status = models.New
+		var status = entity.New
 		order.Status = status // Set order status  Enum
 		collection := client.Database("market").Collection("order")
 		_, err = collection.InsertOne(ctx, order)

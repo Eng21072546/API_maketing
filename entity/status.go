@@ -1,4 +1,4 @@
-package models
+package entity
 
 // Direction - Custom type to hold value for week day ranging from 1-4
 type Status int

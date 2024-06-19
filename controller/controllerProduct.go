@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/Eng21072546/API_maketing/models"
+	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/go-playground/validator"
 	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
@@ -49,7 +49,7 @@ func PostProduct(c *fiber.Ctx) error {
 	}
 
 	// 1. Parse the request body
-	var product models.Product
+	var product entity.Product
 	err := c.BodyParser(&product)
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
@@ -78,12 +78,12 @@ func PutProduct(c *fiber.Ctx) error {
 	var id int
 	fmt.Sscan(productId, &id) // Convert string ID to int
 
-	var productUpdates models.ProductUpdate
+	var productUpdates entity.ProductUpdate
 	err := c.BodyParser(&productUpdates)
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 	}
-	
+
 	validate := validator.New()
 	err = validate.Struct(productUpdates)
 	if err != nil {
@@ -132,7 +132,7 @@ func PatchStock(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	var id int
 	fmt.Sscan(productId, &id)
-	var product models.Product
+	var product entity.Product
 	err := c.BodyParser(&product)
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})

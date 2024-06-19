@@ -3,12 +3,12 @@ package repo
 import (
 	"context"
 	"fmt"
-	"github.com/Eng21072546/API_maketing/models"
+	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateProduct(product models.Product) (*mongo.InsertOneResult, error) {
+func CreateProduct(product entity.Product) (*mongo.InsertOneResult, error) {
 	collection := client.Database("market").Collection("product")
 	result, err := collection.InsertOne(ctx, product)
 	if err != nil {
@@ -17,19 +17,19 @@ func CreateProduct(product models.Product) (*mongo.InsertOneResult, error) {
 	return result, nil
 }
 
-func GetProduct(productID int) (models.Product, error) {
-	var product models.Product
+func GetProduct(productID int) (entity.Product, error) {
+	var product entity.Product
 	filter := bson.M{"id": productID}
 	collection := client.Database("market").Collection("product")
 	err := collection.FindOne(ctx, filter).Decode(&product)
 	if err != nil {
-		return models.Product{}, err
+		return entity.Product{}, err
 	}
 	return product, nil
 }
 
-func GetAllProduct() (products []models.Product, err error) {
-	var productsList []models.Product
+func GetAllProduct() (products []entity.Product, err error) {
+	var productsList []entity.Product
 	collection := client.Database("market").Collection("product")
 	cursor, err := collection.Find(context.Background(), bson.M{}) // Empty bson.M{} matches all documents
 	if err != nil {
@@ -43,7 +43,7 @@ func GetAllProduct() (products []models.Product, err error) {
 	return productsList, nil
 }
 
-func UpdateProduct(id int, productUpdates models.ProductUpdate) (*mongo.UpdateResult, error) {
+func UpdateProduct(id int, productUpdates entity.ProductUpdate) (*mongo.UpdateResult, error) {
 
 	filter := bson.M{"id": id}
 	update := bson.D{{"$set", productUpdates}} // Update specific fields
