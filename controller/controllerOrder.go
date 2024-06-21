@@ -12,7 +12,6 @@ import (
 var order entity.Order
 
 func CreateOrder(c *fiber.Ctx) error {
-
 	if err := c.BodyParser(&order); err != nil {
 		return err // Handle decoding errors
 	}
