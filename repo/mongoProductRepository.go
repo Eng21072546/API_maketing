@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -30,27 +29,17 @@ func (m *MongoProductRepository) InsertProduct(product *entity.Product) (*mongo.
 	return result, nil
 }
 
-func (m *MongoProductRepository) FindProductById(id string) (*entity.Product, error) {
+func (m *MongoProductRepository) FindProductById(id int) (*entity.Product, error) {
 	var product entity.Product
-	var idInt int
-	_, err := fmt.Sscan(id, &idInt) // Convert string ID to int
-	if err != nil {
-		return nil, err
-	}
-	err = m.collection.FindOne(m.ctx, bson.M{"id": idInt}).Decode(&product)
+	err = m.collection.FindOne(m.ctx, bson.M{"id": id}).Decode(&product)
 	if err != nil {
 		return nil, err
 	}
 	return &product, nil
 }
 
-func (m *MongoProductRepository) UpdateProduct(id string, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
-	var idInt int
-	_, err := fmt.Sscan(id, &idInt) // Convert string ID to int
-	if err != nil {
-		return nil, err
-	}
-	filter := bson.M{"id": idInt}
+func (m *MongoProductRepository) UpdateProduct(id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
+	filter := bson.M{"id": id}
 	update := bson.D{{"$set", productUpdate}}
 	updateResult, err := m.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -71,16 +60,35 @@ func (m *MongoProductRepository) FindAllProducts() (*[]entity.Product, error) {
 	return &products, nil
 }
 
-func (m *MongoProductRepository) DeleteProductById(id string) (*mongo.DeleteResult, error) {
-	var idInt int
-	_, err := fmt.Sscan(id, &idInt) // Convert string ID to int
-	if err != nil {
-		return nil, err
-	}
-	filter := bson.M{"id": idInt}
+func (m *MongoProductRepository) DeleteProductById(id int) (*mongo.DeleteResult, error) {
+	filter := bson.M{"id": id}
 	result, err := m.collection.DeleteOne(m.ctx, filter)
 	if err != nil {
 		return result, err
 	}
 	return result, nil
+}
+
+func (m *MongoProductRepository) DecreaseStock(order entity.Order) error {
+	for _, productOrder := range order.ProductList {
+		product, _ := m.FindProductById(productOrder.ProductID)
+		currenStock := product.Stock
+		newStock := currenStock - productOrder.Quantity
+		err := m.UpdateStock(productOrder.ProductID, newStock)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (m *MongoProductRepository) UpdateStock(productID int, quantity int) error {
+	collection := client.Database("market").Collection("product")
+	filter := bson.M{"id": productID}
+	update := bson.M{"$set": bson.M{"stock": quantity}}
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
