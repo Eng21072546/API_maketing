@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/payload"
 	"github.com/Eng21072546/API_maketing/useCase"
@@ -23,7 +24,13 @@ func (h *HttpProductHandler) GetAllProducts(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"Products": products})
 }
 func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
-	id := c.Params("id")
+	idStr := c.Params("id")
+	var id int
+	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
+	}
+
 	product, err := h.productUseCase.GetProduct(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Product Not Found"})
@@ -49,6 +56,12 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 
 func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 	var update payload.ProductUpdate
+	idStr := c.Params("id")
+	var id int
+	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
+	}
 	if err := c.BodyParser(&update); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
@@ -62,7 +75,12 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 }
 
 func (h HttpProductHandler) DeleteProduct(c *fiber.Ctx) error {
-	id := c.Params("id")
+	idStr := c.Params("id")
+	var id int
+	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
+	}
 	result, err := h.productUseCase.DeleteProduct(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
