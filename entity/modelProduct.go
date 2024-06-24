@@ -12,3 +12,9 @@ type ProductUpdate struct {
 	Price float64 `json:"price" validate:"required"`
 	Stock int     `json:"stock" validate:"required"`
 }
+
+type Stock struct {
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	Quantities int    `json:"quantities"`
+}
