@@ -2,12 +2,10 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/useCase"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"math/rand"
-	"time"
 )
 
 type MongoOrderRepository struct {
@@ -23,15 +21,14 @@ func NewMongoOrderRepository(collection *mongo.Collection, ctx2 context.Context,
 		cancel:     cancelFunc}
 }
 
-func (m *MongoOrderRepository) SaveOrder(order entity.Order) (entity.Order, []string) {
-	var errList []string
+func (m *MongoOrderRepository) InsertOrder(order entity.Order) (*mongo.InsertOneResult, error) {
+
 	//err := entity.CheckAddress(order)
 	//if err != nil {
 	//	errList = append(errList, err.Error())
 	//}
 	// Generate a random order ID (replace with a more robust ID generation mechanism if needed)
-	rand.Seed(time.Now().UnixNano())
-	order.ID = 10000 + rand.Intn(90001) //id will in range 10000-100000
+	//id will in range 10000-100000
 
 	// Validate product availability in future (implementation not shown here)
 	//for _, productorder := range order.ProductList {
@@ -42,18 +39,39 @@ func (m *MongoOrderRepository) SaveOrder(order entity.Order) (entity.Order, []st
 	//		errList = append(errList, errorMessage) // Append string to errList
 	//	}
 	//}
-	if len(errList) != 0 {
-		fmt.Println("Order ID %d NOT confrim", order.ID)
-		return order, errList
-	} else {
-		var status = entity.New
-		order.Status = status // Set order status  Enum
-		//collection := client.Database("market").Collection("order")
-		_, err = m.collection.InsertOne(ctx, order)
-		if err != nil {
-			return order, errList // Handle insertion errors
-		}
+
+	//collection := client.Database("market").Collection("order")
+	result, err := m.collection.InsertOne(m.ctx, order)
+	if err != nil {
+		return nil, err
 	}
 
+	return result, nil
+}
+
+func (m *MongoOrderRepository) FindOrderById(id string) (*entity.Order, error) {
+	result := m.collection.FindOne(m.ctx, bson.M{"id": id})
+	order := new(entity.Order)
+	err := result.Decode(order)
+	if err != nil {
+		return nil, err
+	}
 	return order, nil
+}
+
+func (m *MongoOrderRepository) UpdateOrderStatus(orderID string, newStatus entity.Status) (err error) {
+	//Build the filter to identify the order
+	filter := bson.M{"id": bson.M{"$eq": orderID}} // Replace "_id" if your order uses a different identifier
+
+	// Update document with the new status
+	update := bson.M{"$set": bson.M{"Status": newStatus}}
+
+	// Update the order status
+	_, err = m.collection.UpdateOne(m.ctx, filter, update)
+	if err != nil {
+		return err // Handle errors appropriately (e.g., logging, returning specific error codes)
+		// }
+
+	}
+	return nil
 }

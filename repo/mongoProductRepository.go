@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -69,8 +70,9 @@ func (m *MongoProductRepository) DeleteProductById(id int) (*mongo.DeleteResult,
 	return result, nil
 }
 
-func (m *MongoProductRepository) DecreaseStock(order entity.Order) error {
-	for _, productOrder := range order.ProductList {
+func (m *MongoProductRepository) DecreaseStock(productOrder []entity.ProductOrder) error {
+
+	for _, productOrder := range productOrder {
 		product, _ := m.FindProductById(productOrder.ProductID)
 		currenStock := product.Stock
 		newStock := currenStock - productOrder.Quantity
@@ -83,12 +85,31 @@ func (m *MongoProductRepository) DecreaseStock(order entity.Order) error {
 }
 
 func (m *MongoProductRepository) UpdateStock(productID int, quantity int) error {
-	collection := client.Database("market").Collection("product")
 	filter := bson.M{"id": productID}
 	update := bson.M{"$set": bson.M{"stock": quantity}}
-	_, err := collection.UpdateOne(ctx, filter, update)
+	_, err := m.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *MongoProductRepository) CheckStock(productID int, quantity int) error {
+	if quantity == 0 {
+		return nil
+	}
+	product, err := m.FindProductById(productID)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return fmt.Errorf("product with ID %d not found", productID)
+		}
+		return fmt.Errorf("error finding product: %w", err)
+	}
+	stock := entity.Stock{ID: product.ID, Quantities: product.Stock}
+
+	if stock.Quantities < quantity {
+		return fmt.Errorf("insufficient stock for product ID %d, only %d available", productID, stock.Quantities)
 	}
 	return nil
 }

@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -75,32 +74,4 @@ func UpdateStock(productID int, quantity int) error {
 		return err
 	}
 	return nil
-}
-
-func CheckStock(productID int, quantity int) (bool, error) {
-
-	var result struct {
-		DesiredField int `bson:"stock"` // Replace with actual field name and type
-	}
-	var filter interface{}
-	filter = bson.M{"id": productID}
-
-	collection := client.Database("market").Collection("product")
-
-	err := collection.FindOne(ctx, filter).Decode(&result) // Access the retrieved value in the "result" map using "desiredField" key
-
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return false, fmt.Errorf("product with ID %d not found", productID)
-		}
-		return false, fmt.Errorf("error finding product: %w", err)
-	}
-	// 4. Check if stock is available and sufficient
-	stock := result.DesiredField
-
-	if stock < quantity {
-		return false, fmt.Errorf("insufficient stock for product ID %d, only %d available", productID, stock)
-	}
-
-	return true, nil
 }

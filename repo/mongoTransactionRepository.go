@@ -16,7 +16,7 @@ func NewMongoTransactionRepository(client *mongo.Client, ctx context.Context) *M
 	return &MongoTransactionRepository{client, ctx}
 }
 
-func (t MongoTransactionRepository) InsertTransaction(ctx context.Context, transaction collection.Transaction) (*mongo.InsertOneResult, error) {
+func (t MongoTransactionRepository) InsertTransaction(ctx context.Context, transaction *collection.Transaction) (*mongo.InsertOneResult, error) {
 	return t.client.Database("market").Collection("transaction").InsertOne(t.ctxMongo, transaction)
 }
 

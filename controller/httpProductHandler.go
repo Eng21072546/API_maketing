@@ -17,6 +17,7 @@ func NewHttpProductHandler(ProductUseCase useCase.ProductUseCase) *HttpProductHa
 }
 
 func (h *HttpProductHandler) GetAllProducts(c *fiber.Ctx) error {
+	fmt.Println("productUseCase")
 	products, err := h.productUseCase.GetAllProduct()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
@@ -66,7 +67,6 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 	var product = &entity.ProductUpdate{Name: update.Name, Price: update.Price, Stock: update.Stock}
-	id := c.Params("id")
 	result, err := h.productUseCase.UpdateProduct(id, product)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
