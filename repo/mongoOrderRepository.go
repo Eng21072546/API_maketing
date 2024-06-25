@@ -11,39 +11,16 @@ import (
 )
 
 type MongoOrderRepository struct {
-	collection *mongo.Collection
-	ctx        context.Context
-	cancel     context.CancelFunc
+	client   *mongo.Client
+	ctxMongo context.Context
 }
 
-func NewMongoOrderRepository(collection *mongo.Collection, ctx2 context.Context, cancelFunc context.CancelFunc) useCase.OrderRepository {
-	return &MongoOrderRepository{
-		collection: collection,
-		ctx:        ctx2,
-		cancel:     cancelFunc}
+func NewMongoOrderRepository(client *mongo.Client, ctx context.Context) useCase.OrderRepository {
+	return &MongoOrderRepository{client, ctx}
 }
 
-func (m *MongoOrderRepository) InsertOrder(order collection.Order) (*mongo.InsertOneResult, error) {
-
-	//err := entity.CheckAddress(order)
-	//if err != nil {
-	//	errList = append(errList, err.Error())
-	//}
-	// Generate a random order ID (replace with a more robust ID generation mechanism if needed)
-	//id will in range 10000-100000
-
-	// Validate product availability in future (implementation not shown here)
-	//for _, productorder := range order.ProductList {
-	//	bool, err := CheckStock(productorder.ProductID, productorder.Quantity)
-	//	if bool != true {
-	//		fmt.Println(err)
-	//		errorMessage := err.Error()             // Convert err to string
-	//		errList = append(errList, errorMessage) // Append string to errList
-	//	}
-	//}
-
-	//collection := client.Database("market").Collection("order")
-	result, err := m.collection.InsertOne(m.ctx, order)
+func (m *MongoOrderRepository) InsertOrder(ctx context.Context, order collection.Order) (*mongo.InsertOneResult, error) {
+	result, err := m.client.Database("market").Collection("order").InsertOne(m.ctxMongo, order)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +28,8 @@ func (m *MongoOrderRepository) InsertOrder(order collection.Order) (*mongo.Inser
 	return result, nil
 }
 
-func (m *MongoOrderRepository) FindOrderById(id string) (*entity.Order, error) {
-	result := m.collection.FindOne(m.ctx, bson.M{"id": id})
+func (m *MongoOrderRepository) FindOrderById(ctx context.Context, id string) (*entity.Order, error) {
+	result := m.client.Database("market").Collection("order").FindOne(m.ctxMongo, bson.M{"id": id})
 	order := new(entity.Order)
 	err := result.Decode(order)
 	if err != nil {
@@ -61,7 +38,7 @@ func (m *MongoOrderRepository) FindOrderById(id string) (*entity.Order, error) {
 	return order, nil
 }
 
-func (m *MongoOrderRepository) UpdateOrderStatus(orderID string, newStatus entity.Status) (err error) {
+func (m *MongoOrderRepository) UpdateOrderStatus(ctx context.Context, orderID string, newStatus entity.Status) (err error) {
 	//Build the filter to identify the order
 	filter := bson.M{"id": bson.M{"$eq": orderID}} // Replace "_id" if your order uses a different identifier
 
@@ -69,7 +46,7 @@ func (m *MongoOrderRepository) UpdateOrderStatus(orderID string, newStatus entit
 	update := bson.M{"$set": bson.M{"Status": newStatus}}
 
 	// Update the order status
-	_, err = m.collection.UpdateOne(m.ctx, filter, update)
+	_, err = m.client.Database("market").Collection("order").UpdateOne(m.ctxMongo, filter, update)
 	if err != nil {
 		return err // Handle errors appropriately (e.g., logging, returning specific error codes)
 		// }
