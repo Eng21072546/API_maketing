@@ -9,74 +9,69 @@ import (
 )
 
 type MongoProductRepository struct {
-	collection *mongo.Collection
-	ctx        context.Context
-	cancel     context.CancelFunc
+	client   *mongo.Client
+	ctxMongo context.Context
 }
 
-func NewMongoProductRepository(collection *mongo.Collection, ctx2 context.Context, cancelFunc context.CancelFunc) *MongoProductRepository {
-	return &MongoProductRepository{
-		collection: collection,
-		ctx:        ctx2,
-		cancel:     cancelFunc,
-	}
+func NewMongoProductRepository(client *mongo.Client, ctx context.Context) *MongoProductRepository {
+	return &MongoProductRepository{client, ctx}
 }
 
-func (m *MongoProductRepository) InsertProduct(product *entity.Product) (*mongo.InsertOneResult, error) {
-	result, err := m.collection.InsertOne(ctx, product)
+func (m *MongoProductRepository) InsertProduct(ctx context.Context, product *entity.Product) (*mongo.InsertOneResult, error) {
+	result, err := m.client.Database("market").Collection("product").InsertOne(ctx, product)
 	if err != nil {
 		return result, err
 	}
 	return result, nil
 }
 
-func (m *MongoProductRepository) FindProductById(id int) (*entity.Product, error) {
+func (m *MongoProductRepository) FindProductById(ctx context.Context, id int) (*entity.Product, error) {
 	var product entity.Product
-	err = m.collection.FindOne(m.ctx, bson.M{"id": id}).Decode(&product)
+	err = m.client.Database("market").Collection("product").FindOne(m.ctxMongo, bson.M{"id": id}).Decode(&product)
 	if err != nil {
 		return nil, err
 	}
 	return &product, nil
 }
 
-func (m *MongoProductRepository) UpdateProduct(id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
+func (m *MongoProductRepository) UpdateProduct(ctx context.Context, id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
 	filter := bson.M{"id": id}
 	update := bson.D{{"$set", productUpdate}}
-	updateResult, err := m.collection.UpdateOne(ctx, filter, update)
+	updateResult, err := m.client.Database("market").Collection("product").UpdateOne(m.ctxMongo, filter, update)
 	if err != nil {
 		return nil, err
 	}
 	return updateResult, nil
 }
 
-func (m *MongoProductRepository) FindAllProducts() (*[]entity.Product, error) {
+func (m *MongoProductRepository) FindAllProducts(ctx context.Context) (*[]entity.Product, error) {
 	var products []entity.Product
-	cursor, err := m.collection.Find(m.ctx, bson.M{})
+	cursor, err := m.client.Database("market").Collection("product").Find(m.ctxMongo, bson.M{})
 	if err != nil {
 		return nil, err
 	}
-	if err = cursor.All(m.ctx, &products); err != nil {
+	if err = cursor.All(m.ctxMongo, &products); err != nil {
 		return nil, err
 	}
 	return &products, nil
 }
 
-func (m *MongoProductRepository) DeleteProductById(id int) (*mongo.DeleteResult, error) {
+func (m *MongoProductRepository) DeleteProductById(ctx context.Context, id int) (*mongo.DeleteResult, error) {
 	filter := bson.M{"id": id}
-	result, err := m.collection.DeleteOne(m.ctx, filter)
+	result, err := m.client.Database("market").Collection("product").DeleteOne(m.ctxMongo, filter)
 	if err != nil {
 		return result, err
 	}
 	return result, nil
 }
 
-func (m *MongoProductRepository) DecreaseStock(productOrder []entity.ProductOrder) error {
+func (m *MongoProductRepository) DecreaseStock(ctx context.Context, productOrder []entity.ProductOrder) error {
 
 	for _, productOrder := range productOrder {
-		product, _ := m.FindProductById(productOrder.ProductID)
+		product, _ := m.FindProductById(ctx, productOrder.ProductID)
 		currenStock := product.Stock
 		newStock := currenStock - productOrder.Quantity
-		err := m.UpdateStock(productOrder.ProductID, newStock)
+		err := m.UpdateStock(ctx, productOrder.ProductID, newStock)
 		if err != nil {
 			return err
 		}
@@ -84,21 +79,21 @@ func (m *MongoProductRepository) DecreaseStock(productOrder []entity.ProductOrde
 	return nil
 }
 
-func (m *MongoProductRepository) UpdateStock(productID int, quantity int) error {
+func (m *MongoProductRepository) UpdateStock(ctx context.Context, productID int, quantity int) error {
 	filter := bson.M{"id": productID}
 	update := bson.M{"$set": bson.M{"stock": quantity}}
-	_, err := m.collection.UpdateOne(ctx, filter, update)
+	_, err := m.client.Database("market").Collection("product").UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *MongoProductRepository) CheckStock(productID int, quantity int) error {
+func (m *MongoProductRepository) CheckStock(ctx context.Context, productID int, quantity int) error {
 	if quantity == 0 {
 		return nil
 	}
-	product, err := m.FindProductById(productID)
+	product, err := m.FindProductById(ctx, productID)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
