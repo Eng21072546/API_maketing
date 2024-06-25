@@ -13,7 +13,7 @@ import (
 
 type OrderUseCase interface {
 	//GetOrderTransaction(id string) (*entity.Transaction, error)
-	PatchOrderStatus(id string) (*entity.Order, error)
+	PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error)
 	NewOrderEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error)
 	NewOrder(Ctx context.Context, order *entity.Order) (*entity.Order, []error)
 }
@@ -28,7 +28,7 @@ func NewOrderUseCase(orderRepo OrderRepository, productRepo ProductRepository, t
 	return &OrderUseCaseImpl{orderRepo: orderRepo, productRepo: productRepo, transactionRepo: transactionRepo}
 }
 
-func (o *OrderUseCaseImpl) NewOrder(Ctx context.Context, order *entity.Order) (*entity.Order, []error) {
+func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*entity.Order, []error) {
 	var errList []error
 	var checked []entity.ProductOrder
 	var orderTotalPrice float64
@@ -62,7 +62,7 @@ func (o *OrderUseCaseImpl) NewOrder(Ctx context.Context, order *entity.Order) (*
 	order.UpdatedAt = time.Now()
 	order.Amount = len(order.Transaction)
 	order.Total = orderTotalPrice
-	_, err := o.orderRepo.InsertOrder(collection.NewOrder(order))
+	_, err := o.orderRepo.InsertOrder(ctx, collection.NewOrder(order))
 	if err != nil {
 		errList = append(errList, err)
 	}
@@ -72,8 +72,8 @@ func (o *OrderUseCaseImpl) NewOrder(Ctx context.Context, order *entity.Order) (*
 	return order, nil
 }
 
-func (o *OrderUseCaseImpl) PatchOrderStatus(id string) (*entity.Order, error) {
-	order, err := o.orderRepo.FindOrderById(id)
+func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error) {
+	order, err := o.orderRepo.FindOrderById(ctx, id)
 	if err != nil {
 		return nil, errors.New("order not found")
 	}
@@ -88,11 +88,11 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(id string) (*entity.Order, error) {
 	} else {
 		newStatus = entity.Done
 	}
-	err = o.orderRepo.UpdateOrderStatus(id, newStatus) //update status
+	err = o.orderRepo.UpdateOrderStatus(ctx, id, newStatus) //update status
 	if err != nil {
 		return nil, errors.New("order status update failed")
 	}
-	order, err = o.orderRepo.FindOrderById(id)
+	order, err = o.orderRepo.FindOrderById(ctx, id)
 	if err != nil {
 		return nil, errors.New("order not found")
 	}

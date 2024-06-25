@@ -18,7 +18,7 @@ func NewHttpProductHandler(ProductUseCase useCase.ProductUseCase) *HttpProductHa
 
 func (h *HttpProductHandler) GetAllProducts(c *fiber.Ctx) error {
 	fmt.Println("productUseCase")
-	products, err := h.productUseCase.GetAllProduct()
+	products, err := h.productUseCase.GetAllProduct(c.Context())
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
 	}
@@ -32,7 +32,7 @@ func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 
-	product, err := h.productUseCase.GetProduct(id)
+	product, err := h.productUseCase.GetProduct(c.Context(), id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Product Not Found"})
 	}
@@ -48,7 +48,7 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 		Price: create.Price,
 		Stock: create.Stock,
 	}
-	product, err := h.productUseCase.CreateProduct(product)
+	product, err := h.productUseCase.CreateProduct(c.Context(), product)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
 	}
@@ -67,7 +67,7 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 	var product = &entity.ProductUpdate{Name: update.Name, Price: update.Price, Stock: update.Stock}
-	result, err := h.productUseCase.UpdateProduct(id, product)
+	result, err := h.productUseCase.UpdateProduct(c.Context(), id, product)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
 	}
@@ -81,7 +81,7 @@ func (h HttpProductHandler) DeleteProduct(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
-	result, err := h.productUseCase.DeleteProduct(id)
+	result, err := h.productUseCase.DeleteProduct(c.Context(), id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
 	}

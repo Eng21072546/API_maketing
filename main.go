@@ -20,8 +20,8 @@ func main() {
 	}
 
 	transactionRepo := repo.NewMongoTransactionRepository(Client, Ctx)
-	productRepo := repo.NewMongoProductRepository(Client.Database("market").Collection("product"), Ctx, Cancel)
-	orderRepo := repo.NewMongoOrderRepository(Client.Database("market").Collection("order"), Ctx, Cancel)
+	productRepo := repo.NewMongoProductRepository(Client, Ctx)
+	orderRepo := repo.NewMongoOrderRepository(Client, Ctx)
 
 	productUseCase := useCase.NewProductUseCase(productRepo)
 	productHandler := controller.NewHttpProductHandler(productUseCase)
@@ -40,12 +40,12 @@ func main() {
 	app.Put("/product/:id", productHandler.UpdateProduct)
 	app.Delete("/product/:id", productHandler.DeleteProduct)
 	app.Post("/order", orderHandler.CreateOrder)
-	//app.Patch("/order/status/:id", orderHandler.PatchOrderStatus)
+	app.Patch("/order/status/:id", orderHandler.PatchOrderStatus)
 	err := app.Listen(":6000")
 	if err != nil {
 		panic(err)
 	}
 	//repo.Init()
 	//routes.UserRoute()
-	configs.Close(configs.Client, configs.Ctx, configs.Cancel)
+	configs.Close(Client, Ctx, Cancel)
 }

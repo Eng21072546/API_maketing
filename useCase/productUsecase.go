@@ -1,6 +1,7 @@
 package useCase
 
 import (
+	"context"
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
@@ -8,11 +9,11 @@ import (
 )
 
 type ProductUseCase interface {
-	CreateProduct(product *entity.Product) (*entity.Product, error)
-	GetProduct(id int) (*entity.Product, error)
-	GetAllProduct() (*[]entity.Product, error)
-	UpdateProduct(id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error)
-	DeleteProduct(id int) (*mongo.DeleteResult, error)
+	CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error)
+	GetProduct(ctx context.Context, id int) (*entity.Product, error)
+	GetAllProduct(ctx context.Context) (*[]entity.Product, error)
+	UpdateProduct(ctx context.Context, id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error)
+	DeleteProduct(ctx context.Context, id int) (*mongo.DeleteResult, error)
 }
 
 type ProductUseCaseImpl struct {
@@ -23,26 +24,26 @@ func NewProductUseCase(repo ProductRepository) ProductUseCase {
 	return &ProductUseCaseImpl{repo: repo}
 }
 
-func (p *ProductUseCaseImpl) CreateProduct(product *entity.Product) (*entity.Product, error) {
+func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
 	rand.Seed(time.Now().UnixNano()) // random id product
 	randomNumber := 10000 + rand.Intn(90001)
 	product.ID = randomNumber
-	_, err := p.repo.InsertProduct(product)
+	_, err := p.repo.InsertProduct(ctx, product)
 	return product, err
 }
 
-func (p *ProductUseCaseImpl) GetProduct(id int) (*entity.Product, error) {
-	return p.repo.FindProductById(id)
+func (p *ProductUseCaseImpl) GetProduct(ctx context.Context, id int) (*entity.Product, error) {
+	return p.repo.FindProductById(ctx, id)
 }
 
-func (p *ProductUseCaseImpl) GetAllProduct() (*[]entity.Product, error) {
-	return p.repo.FindAllProducts()
+func (p *ProductUseCaseImpl) GetAllProduct(ctx context.Context) (*[]entity.Product, error) {
+	return p.repo.FindAllProducts(ctx)
 }
 
-func (p *ProductUseCaseImpl) UpdateProduct(id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
-	return p.repo.UpdateProduct(id, productUpdate)
+func (p *ProductUseCaseImpl) UpdateProduct(ctx context.Context, id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
+	return p.repo.UpdateProduct(ctx, id, productUpdate)
 }
 
-func (p *ProductUseCaseImpl) DeleteProduct(id int) (*mongo.DeleteResult, error) {
-	return p.repo.DeleteProductById(id)
+func (p *ProductUseCaseImpl) DeleteProduct(ctx context.Context, id int) (*mongo.DeleteResult, error) {
+	return p.repo.DeleteProductById(ctx, id)
 }
