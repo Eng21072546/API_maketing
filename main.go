@@ -19,17 +19,19 @@ func main() {
 		panic(Err)
 	}
 
+	transactionRepo := repo.NewMongoTransactionRepository(Client, Ctx)
 	productRepo := repo.NewMongoProductRepository(Client.Database("market").Collection("product"), Ctx, Cancel)
+	orderRepo := repo.NewMongoOrderRepository(Client.Database("market").Collection("order"), Ctx, Cancel)
+
 	productUseCase := useCase.NewProductUseCase(productRepo)
 	productHandler := controller.NewHttpProductHandler(productUseCase)
 
-	orderRepo := repo.NewMongoOrderRepository(Client.Database("market").Collection("order"), Ctx, Cancel)
-	//orderUseCase := useCase.NewOrderUseCase(orderRepo, productRepo)
-	//orderHandler := controller.NewHttpOrderHandler(orderUseCase)
+	orderUseCase := useCase.NewOrderUseCase(orderRepo, productRepo, transactionRepo)
+	orderHandler := controller.NewHttpOrderHandler(orderUseCase)
 
-	transactionRepo := repo.NewMongoTransactionRepository(Client, Ctx)
 	transactionUseCase := useCase.NewTransactionUseCase(transactionRepo, productRepo, orderRepo)
 	transactionHandler := controller.NewHttpTransactionHandler(transactionUseCase)
+
 	app := fiber.New()
 	app.Post("/order/calculate", transactionHandler.PostTransaction)
 	app.Get("/product", productHandler.GetAllProducts)
@@ -37,7 +39,7 @@ func main() {
 	app.Post("/product", productHandler.CreateProduct)
 	app.Put("/product/:id", productHandler.UpdateProduct)
 	app.Delete("/product/:id", productHandler.DeleteProduct)
-	//app.Post("/order/:id", orderHandler.CreateOrder)
+	app.Post("/order", orderHandler.CreateOrder)
 	//app.Patch("/order/status/:id", orderHandler.PatchOrderStatus)
 	err := app.Listen(":6000")
 	if err != nil {

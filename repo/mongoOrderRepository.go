@@ -2,6 +2,8 @@ package repo
 
 import (
 	"context"
+	"fmt"
+	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/useCase"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,7 +23,7 @@ func NewMongoOrderRepository(collection *mongo.Collection, ctx2 context.Context,
 		cancel:     cancelFunc}
 }
 
-func (m *MongoOrderRepository) InsertOrder(order entity.Order) (*mongo.InsertOneResult, error) {
+func (m *MongoOrderRepository) InsertOrder(order collection.Order) (*mongo.InsertOneResult, error) {
 
 	//err := entity.CheckAddress(order)
 	//if err != nil {
@@ -45,7 +47,7 @@ func (m *MongoOrderRepository) InsertOrder(order entity.Order) (*mongo.InsertOne
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println("Saved order", result)
 	return result, nil
 }
 

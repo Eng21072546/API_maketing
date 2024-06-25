@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"github.com/Eng21072546/API_maketing/collection"
+	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -20,9 +21,9 @@ func (t MongoTransactionRepository) InsertTransaction(ctx context.Context, trans
 	return t.client.Database("market").Collection("transaction").InsertOne(t.ctxMongo, transaction)
 }
 
-func (t MongoTransactionRepository) FindTransaction(ctx context.Context, id string) (*collection.Transaction, error) {
+func (t MongoTransactionRepository) FindTransaction(ctx context.Context, id string) (*entity.Transaction, error) {
 	filter := bson.D{{"id", id}}
-	transaction := &collection.Transaction{}
+	transaction := &entity.Transaction{}
 	result := t.client.Database("market").Collection("transaction").FindOne(t.ctxMongo, filter)
 	err := result.Decode(&transaction)
 	if err != nil {

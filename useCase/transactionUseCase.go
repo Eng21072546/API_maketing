@@ -2,6 +2,8 @@ package useCase
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/google/uuid"
@@ -11,7 +13,7 @@ import (
 
 type TransactionUseCase interface {
 	NewTransaction(ctx context.Context, transaction *entity.Transaction) (*entity.Transaction, []error)
-	FindTransactionById(context context.Context, id string) (*collection.Transaction, error)
+	FindTransactionById(context context.Context, id string) (*entity.Transaction, error)
 }
 
 type transactionUseCaseImpl struct {
@@ -24,7 +26,7 @@ func NewTransactionUseCase(transactionRepo TransactionRepository, productRepo Pr
 	return &transactionUseCaseImpl{transactionRepo, productRepo, orderRepo}
 }
 
-func (t transactionUseCaseImpl) FindTransactionById(ctx context.Context, id string) (*collection.Transaction, error) {
+func (t transactionUseCaseImpl) FindTransactionById(ctx context.Context, id string) (*entity.Transaction, error) {
 	return t.transactionRepo.FindTransaction(ctx, id)
 }
 
@@ -37,7 +39,7 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 	for _, productOrder := range transaction.ProductOrder {
 		_, err = t.productRepo.FindProductById(productOrder.ProductID)
 		if err != nil {
-			errList = append(errList, err)
+			errList = append(errList, errors.New(fmt.Sprintf("product ID %d not found", productOrder.ProductID)))
 		}
 	}
 	if len(errList) > 0 { // if product in the ProductOrder list is not match in DB, Stop and return []ERR

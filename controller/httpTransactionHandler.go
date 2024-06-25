@@ -25,7 +25,7 @@ func (t HttpTransactionHandler) PostTransaction(c *fiber.Ctx) error {
 	transaction := entity.NewTransaction(transPayload.AccountName, transPayload.Address, transPayload.ProductOrder)
 	transaction, errList := t.transactionUseCase.NewTransaction(c.Context(), transaction)
 	if errList != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": errList})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": errorsToStrings(errList)})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"transaction": transaction})
 }
