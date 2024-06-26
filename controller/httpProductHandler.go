@@ -6,6 +6,7 @@ import (
 	"github.com/Eng21072546/API_maketing/payload"
 	"github.com/Eng21072546/API_maketing/useCase"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type HttpProductHandler struct {
@@ -57,6 +58,7 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 
 func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 	var update payload.ProductUpdate
+	updateQuery := make(bson.M)
 	idStr := c.Params("id")
 	var id int
 	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
@@ -66,8 +68,18 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 	if err := c.BodyParser(&update); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
-	var product = &entity.ProductUpdate{Name: update.Name, Price: update.Price, Stock: update.Stock}
-	result, err := h.productUseCase.UpdateProduct(c.Context(), id, product)
+	var productUpdate = &entity.ProductUpdate{Name: update.Name, Price: update.Price, Stock: update.Stock}
+	if productUpdate.Name != nil {
+		updateQuery["name"] = update.Name
+	}
+	if productUpdate.Price != nil {
+		updateQuery["price"] = update.Price
+	}
+	if productUpdate.Stock != nil {
+		updateQuery["stock"] = update.Stock
+	}
+
+	result, err := h.productUseCase.UpdateProduct(c.Context(), id, updateQuery)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
 	}

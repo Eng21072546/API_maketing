@@ -7,7 +7,7 @@ type ProductCreate struct {
 }
 
 type ProductUpdate struct {
-	Name  string  `json:"name" validate:"required"`
-	Price float64 `json:"price" validate:"required"`
-	Stock int     `json:"stock" validate:"required"`
+	Name  *string  `json:"name,omitempty"`  // Optional field
+	Price *float64 `json:"price,omitempty"` // Optional field
+	Stock *int     `json:"stock,omitempty"` // Optional field
 }

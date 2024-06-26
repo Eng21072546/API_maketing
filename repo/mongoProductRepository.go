@@ -34,9 +34,9 @@ func (m *MongoProductRepository) FindProductById(ctx context.Context, id int) (*
 	return &product, nil
 }
 
-func (m *MongoProductRepository) UpdateProduct(ctx context.Context, id int, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
+func (m *MongoProductRepository) UpdateProduct(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error) {
 	filter := bson.M{"id": id}
-	update := bson.D{{"$set", productUpdate}}
+	update := bson.M{"$set": updateDocument}
 	updateResult, err := m.client.Database("market").Collection("product").UpdateOne(m.ctxMongo, filter, update)
 	if err != nil {
 		return nil, err

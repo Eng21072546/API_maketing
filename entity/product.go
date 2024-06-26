@@ -8,9 +8,9 @@ type Product struct {
 }
 
 type ProductUpdate struct {
-	Name  string  `json:"name" validate:"required"`
-	Price float64 `json:"price" validate:"required"`
-	Stock int     `json:"stock" validate:"required"`
+	Name  *string  `json:"name" validate:"required"`
+	Price *float64 `json:"price" validate:"required"`
+	Stock *int     `json:"stock" validate:"required"`
 }
 
 type Stock struct {
