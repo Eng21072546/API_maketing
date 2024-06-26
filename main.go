@@ -4,6 +4,7 @@ import (
 	"github.com/Eng21072546/API_maketing/configs"
 	"github.com/Eng21072546/API_maketing/controller"
 	"github.com/Eng21072546/API_maketing/repo"
+	"github.com/Eng21072546/API_maketing/routes"
 	"github.com/gofiber/fiber/v2"
 
 	//"github.com/Eng21072546/API_maketing/routes"
@@ -33,14 +34,11 @@ func main() {
 	transactionHandler := controller.NewHttpTransactionHandler(transactionUseCase)
 
 	app := fiber.New()
-	app.Post("/order/calculate", transactionHandler.PostTransaction)
-	app.Get("/product", productHandler.GetAllProducts)
-	app.Get("product/:id", productHandler.GetProductById)
-	app.Post("/product", productHandler.CreateProduct)
-	app.Put("/product/:id", productHandler.UpdateProduct)
-	app.Delete("/product/:id", productHandler.DeleteProduct)
-	app.Post("/order", orderHandler.CreateOrder)
-	app.Patch("/order/status/:id", orderHandler.PatchOrderStatus)
+
+	routes.ProductRoute(app, productHandler)
+	routes.OrderRoute(app, orderHandler)
+	routes.TransactionRoute(app, transactionHandler)
+
 	err := app.Listen(":6000")
 	if err != nil {
 		panic(err)
