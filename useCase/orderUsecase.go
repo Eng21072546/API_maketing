@@ -14,7 +14,7 @@ import (
 type OrderUseCase interface {
 	//GetOrderTransaction(id string) (*entity.Transaction, error)
 	PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error)
-	NewOrderEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error)
+	OrderPayloadToEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error)
 	NewOrder(Ctx context.Context, order *entity.Order) (*entity.Order, []error)
 }
 
@@ -34,7 +34,7 @@ func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*
 	var orderTotalPrice float64
 	for _, transaction := range order.Transaction {
 		for _, item := range transaction.ProductOrder {
-			err := o.productRepo.CheckStock(item.ProductID, item.Quantity)
+			err := o.productRepo.CheckStock(ctx, item.ProductID, item.Quantity)
 			if err != nil {
 				errList = append(errList, err)
 			}
@@ -46,7 +46,7 @@ func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*
 	}
 
 	for _, transaction := range order.Transaction {
-		err := o.productRepo.DecreaseStock(transaction.ProductOrder)
+		err := o.productRepo.DecreaseStock(ctx, transaction.ProductOrder)
 		if err != nil {
 			errList = append(errList, err)
 		}
@@ -73,9 +73,13 @@ func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*
 }
 
 func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error) {
-	order, err := o.orderRepo.FindOrderById(ctx, id)
+	orderCollection, err := o.orderRepo.FindOrderById(ctx, id)
 	if err != nil {
 		return nil, errors.New("order not found")
+	}
+	order, errList := o.OrderColletionToEntity(ctx, orderCollection)
+	if errList != nil {
+		return nil, err
 	}
 	currStatus := order.Status
 	var newStatus entity.Status
@@ -92,16 +96,20 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	if err != nil {
 		return nil, errors.New("order status update failed")
 	}
-	order, err = o.orderRepo.FindOrderById(ctx, id)
+	orderCollection, err = o.orderRepo.FindOrderById(ctx, id)
 	if err != nil {
 		return nil, errors.New("order not found")
+	}
+	order, errList = o.OrderColletionToEntity(ctx, orderCollection)
+	if errList != nil {
+		return nil, err
 	}
 	fmt.Println("Order ID %d confrim ", order.ID, " Status --> ", order.Status)
 
 	return order, nil
 }
 
-func (o OrderUseCaseImpl) NewOrderEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error) {
+func (o OrderUseCaseImpl) OrderPayloadToEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error) {
 	// This function use for create New order entity from payload, it can check transaction its has in DB?
 	order := &entity.Order{}
 	var errList []error
@@ -119,5 +127,28 @@ func (o OrderUseCaseImpl) NewOrderEntity(ctx context.Context, orderPayload paylo
 	}
 	order.Transaction = transactionList
 	order.CustomerName = orderPayload.CustomerName
+	return order, nil
+}
+
+func (o OrderUseCaseImpl) OrderColletionToEntity(ctx context.Context, orderCol *collection.Order) (*entity.Order, []error) {
+
+	var errList []error
+	var transactionList []*entity.Transaction
+	var totalPrice float64 = 0
+	amount := len(orderCol.Transaction)
+	for _, id := range orderCol.Transaction {
+		transaction, err := o.transactionRepo.FindTransaction(ctx, id)
+		if err != nil {
+			errList = append(errList, errors.New(fmt.Sprintf("transaction %d not found", id)))
+		} else {
+			totalPrice += transaction.TotalPrice
+			transactionList = append(transactionList, transaction)
+		}
+	}
+	if len(errList) > 0 {
+		return nil, errList
+	}
+	order := &entity.Order{orderCol.ID, orderCol.CustomerName, orderCol.Status, transactionList, orderCol.CreatedAt, orderCol.UpdatedAt, amount, totalPrice}
+
 	return order, nil
 }

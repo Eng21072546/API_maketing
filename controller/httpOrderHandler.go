@@ -21,7 +21,7 @@ func (h *HttpOrderHandler) CreateOrder(c *fiber.Ctx) error {
 	if err := c.BodyParser(&orderReq); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errors.New("Invalid request body")})
 	}
-	orderEntity, err := h.orderUseCase.NewOrderEntity(c.Context(), orderReq)
+	orderEntity, err := h.orderUseCase.OrderPayloadToEntity(c.Context(), orderReq)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errorsToStrings(err)})
 	}
@@ -36,7 +36,7 @@ func (h *HttpOrderHandler) PatchOrderStatus(c *fiber.Ctx) error {
 	id := c.Params("id")
 	result, err := h.orderUseCase.PatchOrderStatus(c.Context(), id)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
 	}
 	return c.Status(http.StatusOK).JSON(fiber.Map{"order": result})
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/Eng21072546/API_maketing/useCase"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 type MongoOrderRepository struct {
@@ -28,11 +29,15 @@ func (m *MongoOrderRepository) InsertOrder(ctx context.Context, order collection
 	return result, nil
 }
 
-func (m *MongoOrderRepository) FindOrderById(ctx context.Context, id string) (*entity.Order, error) {
-	result := m.client.Database("market").Collection("order").FindOne(m.ctxMongo, bson.M{"id": id})
-	order := new(entity.Order)
+func (m *MongoOrderRepository) FindOrderById(ctx context.Context, id string) (*collection.Order, error) {
+	filter := bson.D{{"id", id}}
+	result := m.client.Database("market").Collection("order").FindOne(m.ctxMongo, filter)
+	order := new(collection.Order)
 	err := result.Decode(order)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, err
+		}
 		return nil, err
 	}
 	return order, nil
@@ -43,7 +48,7 @@ func (m *MongoOrderRepository) UpdateOrderStatus(ctx context.Context, orderID st
 	filter := bson.M{"id": bson.M{"$eq": orderID}} // Replace "_id" if your order uses a different identifier
 
 	// Update document with the new status
-	update := bson.M{"$set": bson.M{"Status": newStatus}}
+	update := bson.M{"$set": bson.M{"Status": newStatus, "UpdatedAt": time.Now()}}
 
 	// Update the order status
 	_, err = m.client.Database("market").Collection("order").UpdateOne(m.ctxMongo, filter, update)

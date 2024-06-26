@@ -37,7 +37,7 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 		errList = append(errList, err)
 	}
 	for _, productOrder := range transaction.ProductOrder {
-		_, err = t.productRepo.FindProductById(productOrder.ProductID)
+		_, err = t.productRepo.FindProductById(ctx, productOrder.ProductID)
 		if err != nil {
 			errList = append(errList, errors.New(fmt.Sprintf("product ID %d not found", productOrder.ProductID)))
 		}
@@ -46,7 +46,7 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 		return nil, errList
 	}
 	transaction.ID = uuid.New().String()
-	transaction.TotalPrice = t.CalculatePrice(transaction)
+	transaction.TotalPrice = t.CalculatePrice(ctx, transaction)
 	transaction.Amount = len(transaction.ProductOrder)
 	transaction.CreatedAt = time.Now()
 	transaction.UpdatedAt = time.Now()
@@ -61,13 +61,13 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 	return transaction, errList
 }
 
-func (t transactionUseCaseImpl) CalculatePrice(transaction *entity.Transaction) float64 {
+func (t transactionUseCaseImpl) CalculatePrice(ctx context.Context, transaction *entity.Transaction) float64 {
 	var totalPrice float64
 	var bill []string
 	logisticPrice, _ := entity.LogisticCost(transaction.Address)
 	totalPrice += logisticPrice
 	for _, productOrder := range transaction.ProductOrder {
-		product, _ := t.productRepo.FindProductById(productOrder.ProductID)
+		product, _ := t.productRepo.FindProductById(ctx, productOrder.ProductID)
 		productPrice := product.Price * float64(productOrder.Quantity)
 		bill = append(bill, product.Name, " ", strconv.FormatFloat(product.Price, 'f', 2, 64), "  ", string(productOrder.Quantity), " ", strconv.FormatFloat(productPrice, 'f', 2, 64))
 		totalPrice += productPrice
