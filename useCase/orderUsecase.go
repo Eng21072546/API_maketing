@@ -77,21 +77,12 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	if err != nil {
 		return nil, errors.New("order not found")
 	}
-	order, errList := o.OrderColletionToEntity(ctx, orderCollection)
+	order, errList := o.OrderCollectionToEntity(ctx, orderCollection)
 	if errList != nil {
 		return nil, err
 	}
 	currStatus := order.Status
-	var newStatus entity.Status
-	if currStatus == entity.New {
-		newStatus = entity.Paid
-	} else if currStatus == entity.Paid {
-		newStatus = entity.Processing
-	} else if currStatus == entity.Processing {
-		newStatus = entity.Done
-	} else {
-		newStatus = entity.Done
-	}
+	newStatus := entity.UpStatus(currStatus)
 	err = o.orderRepo.UpdateOrderStatus(ctx, id, newStatus) //update status
 	if err != nil {
 		return nil, errors.New("order status update failed")
@@ -100,7 +91,7 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	if err != nil {
 		return nil, errors.New("order not found")
 	}
-	order, errList = o.OrderColletionToEntity(ctx, orderCollection)
+	order, errList = o.OrderCollectionToEntity(ctx, orderCollection)
 	if errList != nil {
 		return nil, err
 	}
@@ -109,7 +100,7 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	return order, nil
 }
 
-func (o OrderUseCaseImpl) OrderPayloadToEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error) {
+func (o *OrderUseCaseImpl) OrderPayloadToEntity(ctx context.Context, orderPayload payload.Order) (*entity.Order, []error) {
 	// This function use for create New order entity from payload, it can check transaction its has in DB?
 	order := &entity.Order{}
 	var errList []error
@@ -130,7 +121,7 @@ func (o OrderUseCaseImpl) OrderPayloadToEntity(ctx context.Context, orderPayload
 	return order, nil
 }
 
-func (o OrderUseCaseImpl) OrderColletionToEntity(ctx context.Context, orderCol *collection.Order) (*entity.Order, []error) {
+func (o *OrderUseCaseImpl) OrderCollectionToEntity(ctx context.Context, orderCol *collection.Order) (*entity.Order, []error) {
 
 	var errList []error
 	var transactionList []*entity.Transaction
