@@ -29,10 +29,10 @@ func (m *MongoOrderRepository) InsertOrder(ctx context.Context, order collection
 	return result, nil
 }
 
-func (m *MongoOrderRepository) FindOrderById(ctx context.Context, id string) (*collection.Order, error) {
+func (m *MongoOrderRepository) FindOrderById(ctx context.Context, id string) (*entity.Order, error) {
 	filter := bson.D{{"id", id}}
 	result := m.client.Database("market").Collection("order").FindOne(m.ctxMongo, filter)
-	order := new(collection.Order)
+	order := new(entity.Order)
 	err := result.Decode(order)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -40,6 +40,7 @@ func (m *MongoOrderRepository) FindOrderById(ctx context.Context, id string) (*c
 		}
 		return nil, err
 	}
+
 	return order, nil
 }
 
@@ -48,7 +49,7 @@ func (m *MongoOrderRepository) UpdateOrderStatus(ctx context.Context, orderID st
 	filter := bson.M{"id": bson.M{"$eq": orderID}} // Replace "_id" if your order uses a different identifier
 
 	// Update document with the new status
-	update := bson.M{"$set": bson.M{"Status": newStatus, "UpdatedAt": time.Now()}}
+	update := bson.M{"$set": bson.M{"status": newStatus, "UpdatedAt": time.Now()}}
 
 	// Update the order status
 	_, err = m.client.Database("market").Collection("order").UpdateOne(m.ctxMongo, filter, update)

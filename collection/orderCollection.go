@@ -6,23 +6,23 @@ import (
 )
 
 type Order struct {
-	ID           string        `json:"id"`
-	CustomerName string        `json:"customer_name"`
-	Status       entity.Status `json:"status"`
-	Transaction  []string      `json:"transaction"`
-	CreatedAt    time.Time     `json:"created_at"`
-	UpdatedAt    time.Time     `json:"updated_at"`
+	ID            string        `json:"id"`
+	CustomerName  string        `json:"customer_name"`
+	Status        entity.Status `json:"status"`
+	TransactionId string        `json:"transactionId"`
+	CreatedAt     time.Time     `json:"created_at"`
+	UpdatedAt     time.Time     `json:"updated_at"`
 }
 
 func NewOrder(orderEntity *entity.Order) Order {
 	order := Order{}
-	var transactionId []string
+
 	order.ID = orderEntity.ID
 	order.CustomerName = orderEntity.CustomerName
 	order.Status = orderEntity.Status
-	for _, transaction := range orderEntity.Transaction {
-		transactionId = append(transactionId, transaction.ID)
-	}
-	order.Transaction = transactionId
+	order.TransactionId = orderEntity.TransactionId
+	order.CreatedAt = orderEntity.CreatedAt
+	order.UpdatedAt = orderEntity.UpdatedAt
+
 	return order
 }

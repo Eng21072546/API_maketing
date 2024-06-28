@@ -9,6 +9,6 @@ import (
 
 type OrderRepository interface {
 	InsertOrder(ctx context.Context, order collection.Order) (*mongo.InsertOneResult, error)
-	FindOrderById(ctx context.Context, orderId string) (*collection.Order, error)
+	FindOrderById(ctx context.Context, orderId string) (*entity.Order, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, newStatus entity.Status) (err error)
 }

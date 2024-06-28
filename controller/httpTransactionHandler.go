@@ -22,7 +22,7 @@ func (t HttpTransactionHandler) PostTransaction(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errors.New("Invalid payload")})
 	}
-	transaction := entity.NewTransaction(transPayload.AccountName, transPayload.Address, transPayload.ProductOrder)
+	transaction := entity.NewTransaction(transPayload.Address, transPayload.ProductOrder)
 	transaction, errList := t.transactionUseCase.NewTransaction(c.Context(), transaction)
 	if errList != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": errorsToStrings(errList)})

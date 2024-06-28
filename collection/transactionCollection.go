@@ -8,7 +8,6 @@ import (
 type Transaction struct {
 	ID           string                `json:"id"`
 	Address      string                `json:"address"`
-	AccountName  string                `json:"account_name"`
 	Amount       int                   `json:"amount"`
 	TotalPrice   float64               `json:"total_price"`
 	CreatedAt    time.Time             `json:"created_at"`
@@ -21,7 +20,6 @@ func NewTransaction(transactionEntity *entity.Transaction) *Transaction {
 	transaction := new(Transaction)
 	transaction.ID = transactionEntity.ID
 	transaction.Address = transactionEntity.Address
-	transaction.AccountName = transactionEntity.AccountName
 	transaction.Amount = transactionEntity.Amount
 	transaction.TotalPrice = transactionEntity.TotalPrice
 	transaction.CreatedAt = transactionEntity.CreatedAt

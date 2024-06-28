@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/payload"
 	"github.com/Eng21072546/API_maketing/useCase"
 	"github.com/gofiber/fiber/v2"
@@ -21,15 +22,13 @@ func (h *HttpOrderHandler) CreateOrder(c *fiber.Ctx) error {
 	if err := c.BodyParser(&orderReq); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errors.New("Invalid request body")})
 	}
-	orderEntity, err := h.orderUseCase.OrderPayloadToEntity(c.Context(), orderReq)
+	orderEntity := entity.Order{CustomerName: orderReq.CustomerName, TransactionId: orderReq.TransactionId}
+
+	order, err := h.orderUseCase.NewOrder(c.Context(), &orderEntity)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errorsToStrings(err)})
 	}
-	orderEntity, err = h.orderUseCase.NewOrder(c.Context(), orderEntity)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errorsToStrings(err)})
-	}
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"OrderCreate": orderEntity})
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"OrderCreate": order})
 }
 
 func (h *HttpOrderHandler) PatchOrderStatus(c *fiber.Ctx) error {
