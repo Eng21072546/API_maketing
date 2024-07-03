@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Eng21072546/API_maketing/configs"
 	"github.com/Eng21072546/API_maketing/controller"
 	"github.com/Eng21072546/API_maketing/repo"
 	"github.com/Eng21072546/API_maketing/routes"
 	"github.com/gofiber/fiber/v2"
-
 	//"github.com/Eng21072546/API_maketing/routes"
 	"github.com/Eng21072546/API_maketing/useCase"
 	"github.com/joho/godotenv"
@@ -15,7 +15,8 @@ import (
 
 func main() {
 	godotenv.Load(".env")
-	Client, Ctx, Cancel, Err := configs.Connect(os.Getenv("DB_URI"))
+	fmt.Println(os.Getenv("MONGODB_URI"))
+	Client, Ctx, Cancel, Err := configs.Connect(os.Getenv("MONGODB_URI"))
 	if Err != nil {
 		panic(Err)
 	}
@@ -40,6 +41,8 @@ func main() {
 	routes.TransactionRoute(app, transactionHandler)
 
 	err := app.Listen(":6000")
+
+	//log.Debug("starting server at http://localhost:" + os.Getenv("PORT"))
 	if err != nil {
 		panic(err)
 	}

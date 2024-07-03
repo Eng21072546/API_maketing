@@ -2,6 +2,8 @@ package entity
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 var logisticPrice = map[string]float64{
@@ -10,17 +12,20 @@ var logisticPrice = map[string]float64{
 }
 
 func CheckAddress(address string) error {
-	_, ok := logisticPrice[address]
+	addressLow := strings.ToLower(address)
+	_, ok := logisticPrice[addressLow]
 	if !ok {
-		return errors.New("Invalid address")
+		return errors.New("invalid address")
 	}
 	return nil
 }
 
 func LogisticCost(address string) (float64, error) {
+	addressLow := strings.ToLower(address)
 	err := CheckAddress(address)
 	if err != nil {
+		fmt.Println(err)
 		return 0, err
 	}
-	return logisticPrice[address], nil
+	return logisticPrice[addressLow], nil
 }

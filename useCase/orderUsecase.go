@@ -34,6 +34,7 @@ func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*
 	transaction, err := o.transactionRepo.FindTransaction(ctx, order.TransactionId)
 	if err != nil {
 		errList = append(errList, err)
+		return nil, errList
 	}
 	order.Transaction = transaction
 
@@ -84,7 +85,7 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	order.Transaction = transaction
 
 	currStatus := order.Status
-	newStatus := entity.UpStatus(currStatus)
+	newStatus := order.UpStatus(currStatus)
 	err = o.orderRepo.UpdateOrderStatus(ctx, id, newStatus) //update status
 	if err != nil {
 		return nil, errors.New("order status update failed")

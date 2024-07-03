@@ -6,7 +6,14 @@ import (
 	"github.com/Eng21072546/API_maketing/payload"
 	"github.com/Eng21072546/API_maketing/useCase"
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"
+	"go.opentelemetry.io/contrib/bridges/otelslog"
+	"log"
+)
+
+var (
+	name = "user-handlers"
+	//tracer = otel.GetTracerProvider().Tracer(name)
+	logger = otelslog.NewLogger(name)
 )
 
 type HttpProductHandler struct {
@@ -18,6 +25,7 @@ func NewHttpProductHandler(ProductUseCase useCase.ProductUseCase) *HttpProductHa
 }
 
 func (h *HttpProductHandler) GetAllProducts(c *fiber.Ctx) error {
+	logger.Info("Get all products")
 	fmt.Println("productUseCase")
 	products, err := h.productUseCase.GetAllProduct(c.Context())
 	if err != nil {
@@ -26,6 +34,7 @@ func (h *HttpProductHandler) GetAllProducts(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"Products": products})
 }
 func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
+	logger.Info("Get product by id")
 	idStr := c.Params("id")
 	var id int
 	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
@@ -35,11 +44,13 @@ func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
 
 	product, err := h.productUseCase.GetProduct(c.Context(), id)
 	if err != nil {
+		log.Panicf("productUseCase.GetProduct %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Product Not Found"})
 	}
 	return c.JSON(fiber.Map{"Product": product})
 }
 func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
+	logger.Info("Create product")
 	var create payload.ProductCreate
 	if err := c.BodyParser(&create); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
@@ -57,8 +68,8 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 }
 
 func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
+	logger.Info("Update product")
 	var update payload.ProductUpdate
-	updateQuery := make(bson.M)
 	idStr := c.Params("id")
 	var id int
 	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
@@ -68,18 +79,8 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 	if err := c.BodyParser(&update); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
-	var productUpdate = &entity.ProductUpdate{Name: update.Name, Price: update.Price, Stock: update.Stock}
-	if productUpdate.Name != nil {
-		updateQuery["name"] = update.Name
-	}
-	if productUpdate.Price != nil {
-		updateQuery["price"] = update.Price
-	}
-	if productUpdate.Stock != nil {
-		updateQuery["stock"] = update.Stock
-	}
-
-	result, err := h.productUseCase.UpdateProduct(c.Context(), id, updateQuery)
+	var productUpdate = &entity.ProductUpdate{ID: id, Name: update.Name, Price: update.Price, Stock: update.Stock}
+	result, err := h.productUseCase.UpdateProduct(c.Context(), productUpdate)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
 	}
@@ -87,6 +88,7 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 }
 
 func (h HttpProductHandler) DeleteProduct(c *fiber.Ctx) error {
+	logger.Info("Delete product")
 	idStr := c.Params("id")
 	var id int
 	_, err := fmt.Sscan(idStr, &id) // Convert string ID to int
