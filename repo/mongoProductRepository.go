@@ -45,17 +45,14 @@ func (m *MongoProductRepository) UpdateProduct(ctx context.Context, id int, upda
 }
 
 func (m *MongoProductRepository) FindAllProducts(ctx context.Context) (*[]entity.Product, error) {
-	fmt.Println("FindAllProductsRepo")
 	var products []entity.Product
 	cursor, err := m.client.Database("market").Collection("product").Find(m.ctxMongo, bson.M{})
-	fmt.Println("FindAllProductsRepo cursor")
 	if err != nil {
 		return nil, err
 	}
 	if err = cursor.All(m.ctxMongo, &products); err != nil {
 		return nil, err
 	}
-	fmt.Println(products)
 	return &products, nil
 }
 

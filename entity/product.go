@@ -8,7 +8,6 @@ type Product struct {
 }
 
 type ProductUpdate struct {
-	ID    int
 	Name  *string
 	Price *float64
 	Stock *int

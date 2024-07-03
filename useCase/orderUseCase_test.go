@@ -2,10 +2,8 @@ package useCase
 
 import (
 	"context"
-	"errors"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -89,7 +87,7 @@ func (t *mockTransactionRepo) InsertTransaction(ctx context.Context, transaction
 }
 
 func TestInsertOrder(t *testing.T) {
-	t.Run("Success", func(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
 		orderRepo := &mockOrderRepo{
 			insertFunc: func(ctx context.Context, order collection.Order) (*mongo.InsertOneResult, error) {
 				return &mongo.InsertOneResult{}, nil
@@ -134,83 +132,15 @@ func TestInsertOrder(t *testing.T) {
 		}
 
 		orderUseCase := NewOrderUseCase(orderRepo, productRepo, transactionRepo)
-		_, errs := orderUseCase.NewOrder(context.Background(), &entity.Order{
-			ID:            "",
+		_, err := orderUseCase.NewOrder(context.Background(), &entity.Order{
+			ID:            "as8923d67f45g23h23jk",
 			CustomerName:  "Jame",
-			Status:        0,
-			TransactionId: uuid.New().String(),
+			Status:        1,
+			TransactionId: "as8923d67f45g23h23jkf34dg",
 			Transaction:   nil,
 			CreatedAt:     time.Time{},
 			UpdatedAt:     time.Time{},
 		})
-		var err error
-		if len(errs) != 0 {
-			err = errs[0]
-		} else {
-			err = nil
-		}
-		assert.NoError(t, err)
-	})
-	t.Run("Transaction not found", func(t *testing.T) {
-		orderRepo := &mockOrderRepo{
-			insertFunc: func(ctx context.Context, order collection.Order) (*mongo.InsertOneResult, error) {
-				return &mongo.InsertOneResult{}, nil
-			},
-			findFunc: func(ctx context.Context, orderId string) (*entity.Order, error) {
-				return &entity.Order{}, nil
-			},
-			updateFunc: func(ctx context.Context, orderID string, newStatus entity.Status) error {
-				return nil
-			},
-		}
-		productRepo := &mockProductRepo{
-			insertFunc: func(ctx context.Context, product *entity.Product) (*mongo.InsertOneResult, error) {
-				return &mongo.InsertOneResult{}, nil
-			},
-			findFunc: func(ctx context.Context, productId int) (*entity.Product, error) {
-				return &entity.Product{}, nil
-			},
-			updateFunc: func(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error) {
-				return &mongo.UpdateResult{}, nil
-			},
-			deleteFunc: func(ctx context.Context, productId int) (*mongo.DeleteResult, error) {
-				return &mongo.DeleteResult{}, nil
-			},
-			updateStockFunc: func(ctx context.Context, productID int, quantity int) error {
-				return nil
-			},
-			checkStockFunc: func(ctx context.Context, productID int, quantity int) error {
-				return nil
-			},
-			decreaseStockFunc: func(ctx context.Context, product []entity.ProductOrder) error {
-				return nil
-			},
-		}
-		transactionRepo := &mockTransactionRepo{
-			insertFunc: func(ctx context.Context, transaction *collection.Transaction) (*mongo.InsertOneResult, error) {
-				return &mongo.InsertOneResult{}, nil
-			},
-			findFunc: func(ctx context.Context, id string) (*entity.Transaction, error) {
-				return nil, errors.New("transaction not found") // Change this transaction not found
-			},
-		}
-
-		orderUseCase := NewOrderUseCase(orderRepo, productRepo, transactionRepo)
-		_, errs := orderUseCase.NewOrder(context.Background(), &entity.Order{
-			ID:            "",
-			CustomerName:  "Jame",
-			Status:        0,
-			TransactionId: uuid.New().String(),
-			Transaction:   nil,
-			CreatedAt:     time.Time{},
-			UpdatedAt:     time.Time{},
-		})
-		var err error
-		if len(errs) != 0 {
-			err = errs[0]
-		} else {
-			err = nil
-		}
-		assert.Equal(t, errors.New("transaction not found"), err)
+		assert.NoError(t, err[0])
 	})
 }

@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"errors"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,7 +27,7 @@ func (t MongoTransactionRepository) FindTransaction(ctx context.Context, id stri
 	result := t.client.Database("market").Collection("transaction").FindOne(t.ctxMongo, filter)
 	err := result.Decode(&transaction)
 	if err != nil {
-		return nil, errors.New("transaction not found")
+		return nil, err
 	}
 	return transaction, nil
 }

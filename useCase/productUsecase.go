@@ -2,7 +2,6 @@ package useCase
 
 import (
 	"context"
-	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +13,7 @@ type ProductUseCase interface {
 	CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error)
 	GetProduct(ctx context.Context, id int) (*entity.Product, error)
 	GetAllProduct(ctx context.Context) (*[]entity.Product, error)
-	UpdateProduct(ctx context.Context, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error)
+	UpdateProduct(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error)
 	DeleteProduct(ctx context.Context, id int) (*mongo.DeleteResult, error)
 }
 
@@ -42,30 +41,10 @@ func (p *ProductUseCaseImpl) GetAllProduct(ctx context.Context) (*[]entity.Produ
 	return p.repo.FindAllProducts(ctx)
 }
 
-func (p *ProductUseCaseImpl) UpdateProduct(ctx context.Context, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
-	updateQuery := make(bson.M)
-	if productUpdate.Name == nil && productUpdate.Price == nil && productUpdate.Stock == nil {
-		return nil, errors.New("product cannot be nil")
-	}
-	if productUpdate.Name != nil {
-		updateQuery["name"] = productUpdate.Name
-	}
-	if productUpdate.Price != nil {
-		updateQuery["price"] = productUpdate.Price
-	}
-	if productUpdate.Stock != nil {
-		if *productUpdate.Stock < 0 {
-			return nil, errors.New("product stock cannot be negative")
-		}
-		updateQuery["stock"] = productUpdate.Stock
-	}
-	return p.repo.UpdateProduct(ctx, productUpdate.ID, updateQuery)
+func (p *ProductUseCaseImpl) UpdateProduct(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error) {
+	return p.repo.UpdateProduct(ctx, id, updateDocument)
 }
 
 func (p *ProductUseCaseImpl) DeleteProduct(ctx context.Context, id int) (*mongo.DeleteResult, error) {
-	result, err := p.repo.DeleteProductById(ctx, id)
-	if err != nil {
-		return result, errors.New("product not found or cannot be deleted")
-	}
-	return result, nil
+	return p.repo.DeleteProductById(ctx, id)
 }
