@@ -14,7 +14,7 @@ type Transaction struct {
 
 type ProductOrder struct {
 	ProductID int
-	Quantity  int
+	Quantity  int `validate:"required,min=1"`
 }
 
 func NewTransaction(address string, productOrder []ProductOrder) *Transaction {

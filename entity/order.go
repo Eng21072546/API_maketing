@@ -12,7 +12,7 @@ type Order struct {
 	UpdatedAt     time.Time
 }
 
-func UpStatus(status Status) Status {
+func (o Order) UpStatus(status Status) Status {
 	var newStatus Status
 	if status == New {
 		newStatus = Paid

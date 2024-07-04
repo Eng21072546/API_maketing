@@ -23,6 +23,7 @@ func main() {
 	transactionRepo := repo.NewMongoTransactionRepository(Client, Ctx)
 	productRepo := repo.NewMongoProductRepository(Client, Ctx)
 	orderRepo := repo.NewMongoOrderRepository(Client, Ctx)
+	logisticRepo := repo.NewMongoLogisticRepository(Client, Ctx)
 
 	productUseCase := useCase.NewProductUseCase(productRepo)
 	productHandler := controller.NewHttpProductHandler(productUseCase)
@@ -30,7 +31,7 @@ func main() {
 	orderUseCase := useCase.NewOrderUseCase(orderRepo, productRepo, transactionRepo)
 	orderHandler := controller.NewHttpOrderHandler(orderUseCase)
 
-	transactionUseCase := useCase.NewTransactionUseCase(transactionRepo, productRepo, orderRepo)
+	transactionUseCase := useCase.NewTransactionUseCase(transactionRepo, productRepo, orderRepo, logisticRepo)
 	transactionHandler := controller.NewHttpTransactionHandler(transactionUseCase)
 
 	app := fiber.New()

@@ -84,7 +84,7 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	order.Transaction = transaction
 
 	currStatus := order.Status
-	newStatus := entity.UpStatus(currStatus)
+	newStatus := order.UpStatus(currStatus)
 	err = o.orderRepo.UpdateOrderStatus(ctx, id, newStatus) //update status
 	if err != nil {
 		return nil, errors.New("order status update failed")
