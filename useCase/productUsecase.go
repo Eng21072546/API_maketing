@@ -34,8 +34,18 @@ func (p *ProductUseCaseImpl) GetAllProduct(ctx context.Context) (*[]entity.Produ
 	return p.repo.FindAllProducts(ctx)
 }
 
-func (p *ProductUseCaseImpl) UpdateProduct(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error) {
-	return p.repo.UpdateProduct(ctx, id, updateDocument)
+func (p *ProductUseCaseImpl) UpdateProduct(ctx context.Context, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error) {
+	updateQuery := make(bson.M)
+	if productUpdate.Name != nil {
+		updateQuery["name"] = productUpdate.Name
+	}
+	if productUpdate.Price != nil {
+		updateQuery["price"] = productUpdate.Price
+	}
+	if productUpdate.Stock != nil {
+		updateQuery["stock"] = productUpdate.Stock
+	}
+	return p.repo.UpdateProduct(ctx, productUpdate.ID, updateQuery)
 }
 
 func (p *ProductUseCaseImpl) DeleteProduct(ctx context.Context, id int) (*mongo.DeleteResult, error) {
