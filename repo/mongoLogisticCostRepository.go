@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/useCase"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -15,7 +14,7 @@ type MongoLogisticCostRepo struct {
 	ctxMongo context.Context
 }
 
-func NewMongoLogisticRepository(client *mongo.Client, ctx context.Context) useCase.LogisticCostRepo {
+func NewMongoLogisticRepository(client *mongo.Client, ctx context.Context) LogisticCostRepo {
 	return &MongoLogisticCostRepo{client, ctx}
 }
 
@@ -32,7 +31,7 @@ func (l MongoLogisticCostRepo) FindLogisticCost(ctx context.Context, address str
 	filter := bson.D{{"address", address}}
 	result := l.client.Database("market").Collection("logisticCost").FindOne(l.ctxMongo, filter)
 	logisticCost := &entity.LogisticCost{}
-	err = result.Decode(logisticCost)
+	err := result.Decode(logisticCost)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, err

@@ -27,7 +27,7 @@ func (m *MongoProductRepository) InsertProduct(ctx context.Context, product *ent
 
 func (m *MongoProductRepository) FindProductById(ctx context.Context, id int) (*entity.Product, error) {
 	var product entity.Product
-	err = m.client.Database("market").Collection("product").FindOne(m.ctxMongo, bson.M{"id": id}).Decode(&product)
+	err := m.client.Database("market").Collection("product").FindOne(m.ctxMongo, bson.M{"id": id}).Decode(&product)
 	if err != nil {
 		return nil, err
 	}

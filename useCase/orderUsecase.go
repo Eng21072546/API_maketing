@@ -6,24 +6,18 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/repo"
 	"github.com/google/uuid"
 	"time"
 )
 
-type OrderUseCase interface {
-	//GetOrderTransaction(id string) (*entity.Transaction, error)
-	PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error)
-
-	NewOrder(Ctx context.Context, order *entity.Order) (*entity.Order, []error)
-}
-
 type OrderUseCaseImpl struct {
-	orderRepo       OrderRepository
-	productRepo     ProductRepository
-	transactionRepo TransactionRepository
+	orderRepo       repo.OrderRepository
+	productRepo     repo.ProductRepository
+	transactionRepo repo.TransactionRepository
 }
 
-func NewOrderUseCase(orderRepo OrderRepository, productRepo ProductRepository, transactionRepo TransactionRepository) OrderUseCase {
+func NewOrderUseCase(orderRepo repo.OrderRepository, productRepo repo.ProductRepository, transactionRepo repo.TransactionRepository) OrderUseCase {
 	return &OrderUseCaseImpl{orderRepo: orderRepo, productRepo: productRepo, transactionRepo: transactionRepo}
 }
 

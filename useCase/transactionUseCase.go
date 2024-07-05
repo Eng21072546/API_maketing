@@ -6,24 +6,20 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/repo"
 	"github.com/google/uuid"
 	"strconv"
 	"time"
 )
 
-type TransactionUseCase interface {
-	NewTransaction(ctx context.Context, transaction *entity.Transaction) (*entity.Transaction, []error)
-	FindTransactionById(context context.Context, id string) (*entity.Transaction, error)
-}
-
 type transactionUseCaseImpl struct {
-	transactionRepo TransactionRepository
-	productRepo     ProductRepository
-	orderRepo       OrderRepository
-	logisticRepo    LogisticCostRepo
+	transactionRepo repo.TransactionRepository
+	productRepo     repo.ProductRepository
+	orderRepo       repo.OrderRepository
+	logisticRepo    repo.LogisticCostRepo
 }
 
-func NewTransactionUseCase(transactionRepo TransactionRepository, productRepo ProductRepository, orderRepo OrderRepository, logisticRepo LogisticCostRepo) TransactionUseCase {
+func NewTransactionUseCase(transactionRepo repo.TransactionRepository, productRepo repo.ProductRepository, orderRepo repo.OrderRepository, logisticRepo repo.LogisticCostRepo) TransactionUseCase {
 	return &transactionUseCaseImpl{transactionRepo, productRepo, orderRepo, logisticRepo}
 }
 
