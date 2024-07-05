@@ -6,13 +6,13 @@ import (
 )
 
 type Transaction struct {
-	ID           string                `json:"id"`
-	Address      string                `json:"address"`
-	Amount       int                   `json:"amount"`
-	TotalPrice   float64               `json:"total_price"`
-	CreatedAt    time.Time             `json:"created_at"`
-	UpdatedAt    time.Time             `json:"updated_at"`
-	ProductOrder []entity.ProductOrder `json:"product_order"`
+	ID           string
+	Address      string
+	Amount       int
+	TotalPrice   float64
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	ProductOrder []entity.ProductOrder
 }
 
 func NewTransaction(transactionEntity *entity.Transaction) *Transaction {

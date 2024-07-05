@@ -6,12 +6,12 @@ import (
 )
 
 type Order struct {
-	ID            string        `json:"id"`
-	CustomerName  string        `json:"customer_name"`
-	Status        entity.Status `json:"status"`
-	TransactionId string        `json:"transactionId"`
-	CreatedAt     time.Time     `json:"created_at"`
-	UpdatedAt     time.Time     `json:"updated_at"`
+	ID            string
+	CustomerName  string
+	Status        entity.Status
+	TransactionId string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 func NewOrder(orderEntity *entity.Order) Order {
