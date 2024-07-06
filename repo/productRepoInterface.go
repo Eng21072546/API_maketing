@@ -16,4 +16,5 @@ type ProductRepository interface {
 	UpdateStock(ctx context.Context, productID int, quantity int) error
 	CheckStock(ctx context.Context, productID int, quantity int) error
 	DecreaseStock(ctx context.Context, productOrder []entity.ProductOrder) error
+	GenProductID() int
 }

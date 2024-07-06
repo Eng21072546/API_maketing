@@ -6,6 +6,8 @@ import (
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"math/rand"
+	"time"
 )
 
 type MongoProductRepository struct {
@@ -107,4 +109,10 @@ func (m *MongoProductRepository) CheckStock(ctx context.Context, productID int, 
 		return fmt.Errorf("insufficient stock for product ID %d, only %d available", productID, stock.Quantities)
 	}
 	return nil
+}
+
+func (m MongoProductRepository) GenProductID() int {
+	rand.Seed(time.Now().UnixNano()) // random id product
+	randomNumber := 10000 + rand.Intn(90001)
+	return randomNumber
 }
