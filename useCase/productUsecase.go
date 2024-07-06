@@ -23,7 +23,14 @@ func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.
 	randomNumber := 10000 + rand.Intn(90001)
 	product.ID = randomNumber
 	_, err := p.repo.InsertProduct(ctx, product)
-	return product, err
+	if err != nil {
+		return nil, err
+	}
+	createdProduct, err := p.repo.FindProductById(ctx, product.ID)
+	if err != nil {
+		return nil, err
+	}
+	return createdProduct, err
 }
 
 func (p *ProductUseCaseImpl) GetProduct(ctx context.Context, id int) (*entity.Product, error) {
