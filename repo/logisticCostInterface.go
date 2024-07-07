@@ -9,5 +9,5 @@ import (
 
 type LogisticCostRepo interface {
 	FindLogisticCost(ctx context.Context, address string) (*entity.LogisticCost, error)
-	InsertLogisticCost(cxt context.Context, cost collection.LogisticCost) (*mongo.InsertOneResult, error)
+	InsertLogisticCost(ctx context.Context, cost collection.LogisticCost) (*mongo.InsertOneResult, error)
 }

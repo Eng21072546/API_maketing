@@ -19,7 +19,7 @@ func NewMongoLogisticRepository(client *mongo.Client, ctx context.Context) Logis
 }
 
 // InsertLogisticCost this function for use with CRUD in the future.
-func (l MongoLogisticCostRepo) InsertLogisticCost(cxt context.Context, cost collection.LogisticCost) (*mongo.InsertOneResult, error) {
+func (l MongoLogisticCostRepo) InsertLogisticCost(ctx context.Context, cost collection.LogisticCost) (*mongo.InsertOneResult, error) {
 	result, err := l.client.Database("market").Collection("logisticCost").InsertOne(l.ctxMongo, cost)
 	if err != nil {
 		return result, err
