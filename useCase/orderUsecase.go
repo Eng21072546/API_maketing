@@ -3,7 +3,6 @@ package useCase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/repo"
@@ -85,7 +84,7 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	}
 	order.Status = newStatus
 
-	fmt.Println("Order ID %d confrim ", order.ID, " Status ", order.Status, "--> ", newStatus)
+	//fmt.Println("Order ID %d confrim ", order.ID, " Status ", order.Status, "--> ", newStatus)
 
 	return order, nil
 }

@@ -6,8 +6,6 @@ import (
 	"github.com/Eng21072546/API_maketing/repo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"math/rand"
-	"time"
 )
 
 type ProductUseCaseImpl struct {
@@ -19,9 +17,7 @@ func NewProductUseCase(repo repo.ProductRepository) ProductUseCase {
 }
 
 func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
-	rand.Seed(time.Now().UnixNano()) // random id product
-	randomNumber := 10000 + rand.Intn(90001)
-	product.ID = randomNumber
+	product.ID = p.repo.GenProductID()
 	_, err := p.repo.InsertProduct(ctx, product)
 	if err != nil {
 		return nil, err
@@ -30,7 +26,7 @@ func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.
 	if err != nil {
 		return nil, err
 	}
-	return createdProduct, err
+	return createdProduct, nil
 }
 
 func (p *ProductUseCaseImpl) GetProduct(ctx context.Context, id int) (*entity.Product, error) {

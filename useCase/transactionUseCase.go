@@ -8,7 +8,6 @@ import (
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/repo"
 	"github.com/google/uuid"
-	"strconv"
 	"time"
 )
 
@@ -60,7 +59,7 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 
 func (t transactionUseCaseImpl) calculatePrice(ctx context.Context, transaction *entity.Transaction) (float64, error) {
 	var totalPrice float64
-	var bill []string
+	//var bill []string
 	logisticCost, err := t.logisticRepo.FindLogisticCost(ctx, (transaction.Address))
 	if err != nil {
 		return 0, err
@@ -69,7 +68,7 @@ func (t transactionUseCaseImpl) calculatePrice(ctx context.Context, transaction 
 	for _, productOrder := range transaction.ProductOrder {
 		product, _ := t.productRepo.FindProductById(ctx, productOrder.ProductID)
 		productPrice := product.Price * float64(productOrder.Quantity)
-		bill = append(bill, product.Name, " ", strconv.FormatFloat(product.Price, 'f', 2, 64), "  ", string(productOrder.Quantity), " ", strconv.FormatFloat(productPrice, 'f', 2, 64))
+		//bill = append(bill, product.Name, " ", strconv.FormatFloat(product.Price, 'f', 2, 64), "  ", string(productOrder.Quantity), " ", strconv.FormatFloat(productPrice, 'f', 2, 64))
 		totalPrice += productPrice
 	}
 	return totalPrice, nil
