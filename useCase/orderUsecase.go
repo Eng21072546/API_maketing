@@ -6,8 +6,6 @@ import (
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/repo"
-	"github.com/google/uuid"
-	"time"
 )
 
 type OrderUseCaseImpl struct {
@@ -52,17 +50,17 @@ func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*
 		return nil, errList
 	}
 	order.Status = entity.New
-	order.ID = uuid.New().String()
-	order.CreatedAt = time.Now()
-	order.UpdatedAt = time.Now()
-	_, err = o.orderRepo.InsertOrder(ctx, collection.NewOrder(order))
+	order.ID = o.orderRepo.SetId()
+	order.CreatedAt = o.orderRepo.SetTime()
+	order.UpdatedAt = o.orderRepo.SetTime()
+	result, err := o.orderRepo.InsertOrder(ctx, collection.NewOrder(order))
 	if err != nil {
 		errList = append(errList, err)
 	}
 	if len(errList) > 0 {
 		return nil, errList
 	}
-	return order, nil
+	return result, nil
 }
 
 func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error) {
@@ -78,13 +76,19 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 
 	currStatus := order.Status
 	newStatus := order.UpStatus(currStatus)
-	err = o.orderRepo.UpdateOrderStatus(ctx, id, newStatus) //update status
+	_, err = o.orderRepo.UpdateOrderStatus(ctx, id, newStatus) //update status
 	if err != nil {
 		return nil, errors.New("order status update failed")
 	}
 	order.Status = newStatus
-
+	orderUpdated, err := o.orderRepo.FindOrderById(ctx, order.ID)
+	if err != nil {
+		return nil, errors.New("can not find order")
+	}
+	if orderUpdated.Status != newStatus {
+		return nil, errors.New("order status update failed")
+	}
 	//fmt.Println("Order ID %d confrim ", order.ID, " Status ", order.Status, "--> ", newStatus)
 
-	return order, nil
+	return orderUpdated, nil
 }

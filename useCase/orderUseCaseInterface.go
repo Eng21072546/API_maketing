@@ -8,6 +8,5 @@ import (
 type OrderUseCase interface {
 	//GetOrderTransaction(id string) (*entity.Transaction, error)
 	PatchOrderStatus(ctx context.Context, id string) (*entity.Order, error)
-
 	NewOrder(Ctx context.Context, order *entity.Order) (*entity.Order, []error)
 }
