@@ -41,7 +41,7 @@ func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
 func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 	var create payload.ProductCreate
 	if err := c.BodyParser(&create); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 	var product = &entity.Product{
 		Name:  create.Name,
@@ -84,7 +84,7 @@ func (h HttpProductHandler) DeleteProduct(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 	result, err := h.productUseCase.DeleteProduct(c.Context(), id)
-	if err != nil {
+	if (result.DeletedCount == 0) || err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"Result": result})

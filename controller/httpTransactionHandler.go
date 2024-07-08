@@ -19,13 +19,13 @@ func NewHttpTransactionHandler(transactionUseCase useCase.TransactionUseCase) *H
 func (t HttpTransactionHandler) PostTransaction(c *fiber.Ctx) error {
 	transPayload := new(payload.Transaction)
 	err := c.BodyParser(transPayload)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errors.New("Invalid payload")})
+	if err != nil || transPayload.Address == "" || transPayload.ProductOrder == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errors.New("invalid request body must have address and product order")})
 	}
 	transaction := entity.NewTransaction(transPayload.Address, transPayload.ProductOrder)
 	transaction, errList := t.transactionUseCase.NewTransaction(c.Context(), transaction)
-	if errList != nil {
+	if errList != nil && len(errList) != 0 {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": errorsToStrings(errList)})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"transaction": transaction})
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"transaction": transaction})
 }
