@@ -19,11 +19,20 @@ func NewMongoTransactionRepository(client *mongo.Client, ctx context.Context) *M
 	return &MongoTransactionRepository{client, ctx}
 }
 
-func (t MongoTransactionRepository) InsertTransaction(ctx context.Context, transaction *collection.Transaction) (*mongo.InsertOneResult, error) {
+func (t MongoTransactionRepository) InsertTransaction(ctx context.Context, transaction *collection.Transaction) (*entity.Transaction, error) {
 	transaction.ID = t.SetId()
 	transaction.CreatedAt = t.SetTime()
 	transaction.UpdatedAt = t.SetTime()
-	return t.client.Database("market").Collection("transaction").InsertOne(t.ctxMongo, transaction)
+
+	_, err := t.client.Database("market").Collection("transaction").InsertOne(t.ctxMongo, transaction)
+	if err != nil {
+		return nil, err
+	}
+	result, err := t.FindTransaction(ctx, transaction.ID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (t MongoTransactionRepository) FindTransaction(ctx context.Context, id string) (*entity.Transaction, error) {

@@ -7,8 +7,6 @@ import (
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/repo"
-	"github.com/google/uuid"
-	"time"
 )
 
 type transactionUseCaseImpl struct {
@@ -32,6 +30,9 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 	if err != nil {
 		errList = append(errList, errors.New("address not found"))
 	}
+	if transaction.ProductOrder == nil {
+		errList = append(errList, errors.New("product order empty"))
+	}
 	for _, productOrder := range transaction.ProductOrder {
 		_, err = t.productRepo.FindProductById(ctx, productOrder.ProductID)
 		if err != nil {
@@ -41,20 +42,17 @@ func (t transactionUseCaseImpl) NewTransaction(ctx context.Context, transaction 
 	if len(errList) > 0 { // if product in the ProductOrder list is not match in DB, Stop and return []ERR
 		return nil, errList
 	}
-	transaction.ID = uuid.New().String()
 	transaction.TotalPrice, err = t.calculatePrice(ctx, transaction)
 	transaction.Amount = len(transaction.ProductOrder)
-	transaction.CreatedAt = time.Now()
-	transaction.UpdatedAt = time.Now()
 
-	_, err = t.transactionRepo.InsertTransaction(ctx, collection.NewTransaction(transaction))
+	result, err := t.transactionRepo.InsertTransaction(ctx, collection.NewTransaction(transaction))
 	if err != nil {
 		errList = append(errList, err)
 	}
 	if len(errList) > 0 {
 		return nil, errList
 	}
-	return transaction, errList
+	return result, errList
 }
 
 func (t transactionUseCaseImpl) calculatePrice(ctx context.Context, transaction *entity.Transaction) (float64, error) {
