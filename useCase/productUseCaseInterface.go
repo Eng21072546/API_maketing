@@ -10,6 +10,6 @@ type ProductUseCase interface {
 	CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error)
 	GetProduct(ctx context.Context, id int) (*entity.Product, error)
 	GetAllProduct(ctx context.Context) (*[]entity.Product, error)
-	UpdateProduct(ctx context.Context, productUpdate *entity.ProductUpdate) (*mongo.UpdateResult, error)
+	UpdateProduct(ctx context.Context, productUpdate *entity.ProductUpdate) (*entity.Product, error)
 	DeleteProduct(ctx context.Context, id int) (*mongo.DeleteResult, error)
 }
