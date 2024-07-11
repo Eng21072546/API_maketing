@@ -18,16 +18,11 @@ func NewProductUseCase(repo _interface.ProductRepository) _interface2.ProductUse
 }
 
 func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
-	product.ID = p.repo.GenProductID()
-	_, err := p.repo.InsertProduct(ctx, product)
+	result, err := p.repo.InsertProduct(ctx, product)
 	if err != nil {
 		return nil, err
 	}
-	createdProduct, err := p.repo.FindProductById(ctx, product.ID)
-	if err != nil {
-		return nil, err
-	}
-	return createdProduct, nil
+	return result, nil
 }
 
 func (p *ProductUseCaseImpl) GetProduct(ctx context.Context, id int) (*entity.Product, error) {

@@ -8,7 +8,7 @@ import (
 )
 
 type ProductRepository interface {
-	InsertProduct(ctx context.Context, product *entity.Product) (*mongo.InsertOneResult, error)
+	InsertProduct(ctx context.Context, product *entity.Product) (*entity.Product, error)
 	FindProductById(ctx context.Context, productId int) (*entity.Product, error)
 	FindAllProducts(ctx context.Context) (*[]entity.Product, error)
 	UpdateProduct(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error)
@@ -16,5 +16,4 @@ type ProductRepository interface {
 	UpdateStock(ctx context.Context, productID int, quantity int) error
 	CheckStock(ctx context.Context, productID int, quantity int) error
 	DecreaseStock(ctx context.Context, productOrder []entity.ProductOrder) error
-	GenProductID() int
 }

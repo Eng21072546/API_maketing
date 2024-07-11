@@ -17,9 +17,9 @@ func (m *MockProductRepo) FindProductById(ctx context.Context, productId int) (*
 	return args.Get(0).(*entity.Product), args.Error(1)
 }
 
-func (m *MockProductRepo) InsertProduct(ctx context.Context, product *entity.Product) (*mongo.InsertOneResult, error) {
+func (m *MockProductRepo) InsertProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
 	args := m.Called(ctx, product)
-	return args.Get(0).(*mongo.InsertOneResult), args.Error(1)
+	return args.Get(0).(*entity.Product), args.Error(1)
 }
 
 func (m *MockProductRepo) FindAllProducts(ctx context.Context) (*[]entity.Product, error) {

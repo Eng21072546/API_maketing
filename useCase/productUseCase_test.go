@@ -53,15 +53,14 @@ func TestProductUseCase(t *testing.T) {
 	})
 	t.Run("CreateProduct success", func(t *testing.T) {
 		product := &entity.Product{
-			ID:    0,
+			ID:    12345,
 			Name:  "test",
 			Price: 123.45,
 			Stock: 67,
 		}
 		mockProduct := setupProductUseCase()
-		mockProduct.mockProductRepo.On("InsertProduct", mock.Anything, mock.Anything).Return(&mongo.InsertOneResult{product}, nil)
+		mockProduct.mockProductRepo.On("InsertProduct", mock.Anything, mock.Anything).Return(product, nil)
 		mockProduct.mockProductRepo.On("FindProductById", mock.Anything, mock.Anything).Return(product, nil)
-		mockProduct.mockProductRepo.On("GenProductID").Return(12345)
 
 		result, err := mockProduct.productUseCase.CreateProduct(context.TODO(), product)
 		assert.NoError(t, err)
@@ -69,15 +68,14 @@ func TestProductUseCase(t *testing.T) {
 	})
 	t.Run("CreateProduct fail", func(t *testing.T) {
 		product := &entity.Product{
-			ID:    0,
+			ID:    12345,
 			Name:  "test",
 			Price: 123.45,
 			Stock: 67,
 		}
 		mockProduct := setupProductUseCase()
-		mockProduct.mockProductRepo.On("InsertProduct", mock.Anything, mock.Anything).Return(&mongo.InsertOneResult{}, errors.New("product not added"))
+		mockProduct.mockProductRepo.On("InsertProduct", mock.Anything, mock.Anything).Return(&entity.Product{}, errors.New("product not added"))
 		mockProduct.mockProductRepo.On("FindProductById", mock.Anything, mock.Anything).Return(product, nil)
-		mockProduct.mockProductRepo.On("GenProductID").Return(12345)
 		result, err := mockProduct.productUseCase.CreateProduct(context.TODO(), product)
 		assert.Error(t, err)
 		assert.Equal(t, (*entity.Product)(nil), result)

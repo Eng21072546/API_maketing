@@ -19,10 +19,15 @@ func NewMongoProductRepository(client *mongo.Client, ctx context.Context) *Mongo
 	return &MongoProductRepository{client, ctx}
 }
 
-func (m *MongoProductRepository) InsertProduct(ctx context.Context, product *entity.Product) (*mongo.InsertOneResult, error) {
-	result, err := m.client.Database("market").Collection("product").InsertOne(ctx, product)
+func (m *MongoProductRepository) InsertProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
+	product.ID = m.setID()
+	_, err := m.client.Database("market").Collection("product").InsertOne(ctx, product)
 	if err != nil {
-		return result, err
+		return nil, err
+	}
+	result, err := m.FindProductById(ctx, product.ID)
+	if err != nil {
+		return nil, err
 	}
 	return result, nil
 }
@@ -111,7 +116,7 @@ func (m *MongoProductRepository) CheckStock(ctx context.Context, productID int, 
 	return nil
 }
 
-func (m MongoProductRepository) GenProductID() int {
+func (m MongoProductRepository) setID() int {
 	rand.Seed(time.Now().UnixNano()) // random id product
 	randomNumber := 10000 + rand.Intn(90001)
 	return randomNumber
