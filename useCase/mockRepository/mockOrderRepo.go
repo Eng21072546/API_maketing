@@ -6,7 +6,6 @@ import (
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 type MockOrderRepo struct {
@@ -26,14 +25,4 @@ func (m *MockOrderRepo) FindOrderById(ctx context.Context, orderId string) (*ent
 func (m *MockOrderRepo) UpdateOrderStatus(ctx context.Context, orderID string, newStatus entity.Status) (*mongo.UpdateResult, error) {
 	args := m.Called(ctx, orderID, newStatus)
 	return args.Get(0).(*mongo.UpdateResult), args.Error(1)
-}
-
-func (m *MockOrderRepo) SetId() string {
-	args := m.Called()
-	return args.String(0)
-}
-
-func (m *MockOrderRepo) SetTime() time.Time {
-	args := m.Called()
-	return args.Get(0).(time.Time)
 }

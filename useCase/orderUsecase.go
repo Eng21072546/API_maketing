@@ -51,9 +51,6 @@ func (o *OrderUseCaseImpl) NewOrder(ctx context.Context, order *entity.Order) (*
 		return nil, errList
 	}
 	order.Status = entity.New
-	order.ID = o.orderRepo.SetId()
-	order.CreatedAt = o.orderRepo.SetTime()
-	order.UpdatedAt = o.orderRepo.SetTime()
 	result, err := o.orderRepo.InsertOrder(ctx, collection.NewOrder(order))
 	if err != nil {
 		errList = append(errList, err)
@@ -89,7 +86,6 @@ func (o *OrderUseCaseImpl) PatchOrderStatus(ctx context.Context, id string) (*en
 	if orderUpdated.Status != newStatus {
 		return nil, errors.New("order status update failed")
 	}
-	//fmt.Println("Order ID %d confrim ", order.ID, " Status ", order.Status, "--> ", newStatus)
 
 	return orderUpdated, nil
 }

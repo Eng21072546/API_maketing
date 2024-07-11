@@ -21,7 +21,9 @@ func NewMongoOrderRepository(client *mongo.Client, ctx context.Context) _interfa
 }
 
 func (m *MongoOrderRepository) InsertOrder(ctx context.Context, order collection.Order) (*entity.Order, error) {
-
+	order.ID = m.setId()
+	order.CreatedAt = m.setTime()
+	order.UpdatedAt = m.setTime()
 	_, err := m.client.Database("market").Collection("order").InsertOne(m.ctxMongo, order)
 	if err != nil {
 		return nil, err
@@ -54,7 +56,7 @@ func (m *MongoOrderRepository) UpdateOrderStatus(ctx context.Context, orderID st
 	filter := bson.M{"id": bson.M{"$eq": orderID}} // Replace "_id" if your order uses a different identifier
 
 	// Update document with the new status
-	update := bson.M{"$set": bson.M{"status": newStatus, "UpdatedAt": m.SetTime()}}
+	update := bson.M{"$set": bson.M{"status": newStatus, "UpdatedAt": m.setTime()}}
 
 	// Update the order status
 	result, err := m.client.Database("market").Collection("order").UpdateOne(m.ctxMongo, filter, update)
@@ -67,10 +69,10 @@ func (m *MongoOrderRepository) UpdateOrderStatus(ctx context.Context, orderID st
 	return result, nil
 }
 
-func (m *MongoOrderRepository) SetTime() time.Time {
+func (m *MongoOrderRepository) setTime() time.Time {
 	return time.Now().UTC()
 }
 
-func (m *MongoOrderRepository) SetId() string {
+func (m *MongoOrderRepository) setId() string {
 	return uuid.New().String()
 }

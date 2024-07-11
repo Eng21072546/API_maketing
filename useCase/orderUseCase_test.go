@@ -74,8 +74,6 @@ func TestOrderUseCaseImpl(t *testing.T) {
 		orderMock.transactionRepo.On("FindTransaction", mock.Anything, mock.Anything).Return(transaction, nil)
 		orderMock.productRepo.On("CheckStock", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		orderMock.productRepo.On("DecreaseStock", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		orderMock.repo.On("SetTime").Return(timeStamp)
-		orderMock.repo.On("SetId").Return(want.ID)
 
 		result, err := orderMock.useCase.NewOrder(context.TODO(), order)
 
@@ -119,8 +117,6 @@ func TestOrderUseCaseImpl(t *testing.T) {
 		orderMock.transactionRepo.On("FindTransaction", mock.Anything, mock.Anything).Return(&entity.Transaction{}, errors.New("transaction not found"))
 		orderMock.productRepo.On("CheckStock", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		orderMock.productRepo.On("DecreaseStock", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		orderMock.repo.On("SetTime").Return(timeStamp)
-		orderMock.repo.On("SetId").Return(want.ID)
 
 		result, err := orderMock.useCase.NewOrder(context.TODO(), order)
 
