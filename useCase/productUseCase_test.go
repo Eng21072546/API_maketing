@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/useCase/interface"
 	"github.com/Eng21072546/API_maketing/useCase/mockRepository"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,7 +19,7 @@ type mockRepo struct {
 
 type mockProductUseCase struct {
 	mockProductRepo *mockRepository.MockProductRepo
-	productUseCase  ProductUseCase
+	productUseCase  _interface.ProductUseCase
 }
 
 func setupProductUseCase() mockProductUseCase {

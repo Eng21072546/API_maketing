@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/repo/interface"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -14,7 +15,7 @@ type MongoLogisticCostRepo struct {
 	ctxMongo context.Context
 }
 
-func NewMongoLogisticRepository(client *mongo.Client, ctx context.Context) LogisticCostRepo {
+func NewMongoLogisticRepository(client *mongo.Client, ctx context.Context) _interface.LogisticCostRepo {
 	return &MongoLogisticCostRepo{client, ctx}
 }
 

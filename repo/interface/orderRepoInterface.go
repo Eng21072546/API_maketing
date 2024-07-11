@@ -1,4 +1,4 @@
-package repo
+package _interface
 
 import (
 	"context"

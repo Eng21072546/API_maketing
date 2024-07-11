@@ -3,16 +3,17 @@ package useCase
 import (
 	"context"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/repo"
+	"github.com/Eng21072546/API_maketing/repo/interface"
+	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ProductUseCaseImpl struct {
-	repo repo.ProductRepository
+	repo _interface.ProductRepository
 }
 
-func NewProductUseCase(repo repo.ProductRepository) ProductUseCase {
+func NewProductUseCase(repo _interface.ProductRepository) _interface2.ProductUseCase {
 	return &ProductUseCaseImpl{repo: repo}
 }
 

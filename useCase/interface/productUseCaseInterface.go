@@ -1,4 +1,4 @@
-package useCase
+package _interface
 
 import (
 	"context"

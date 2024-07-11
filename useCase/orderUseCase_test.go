@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/useCase/interface"
 	"github.com/Eng21072546/API_maketing/useCase/mockRepository"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,7 @@ import (
 )
 
 type mockOrder struct {
-	useCase         OrderUseCase
+	useCase         _interface.OrderUseCase
 	repo            *mockRepository.MockOrderRepo
 	productRepo     *mockRepository.MockProductRepo
 	transactionRepo *mockRepository.MockTransactionRepo

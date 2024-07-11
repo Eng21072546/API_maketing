@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/repo/interface"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +16,7 @@ type MongoOrderRepository struct {
 	ctxMongo context.Context
 }
 
-func NewMongoOrderRepository(client *mongo.Client, ctx context.Context) OrderRepository {
+func NewMongoOrderRepository(client *mongo.Client, ctx context.Context) _interface.OrderRepository {
 	return &MongoOrderRepository{client, ctx}
 }
 

@@ -6,17 +6,18 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/repo"
+	"github.com/Eng21072546/API_maketing/repo/interface"
+	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
 )
 
 type transactionUseCaseImpl struct {
-	transactionRepo repo.TransactionRepository
-	productRepo     repo.ProductRepository
-	orderRepo       repo.OrderRepository
-	logisticRepo    repo.LogisticCostRepo
+	transactionRepo _interface.TransactionRepository
+	productRepo     _interface.ProductRepository
+	orderRepo       _interface.OrderRepository
+	logisticRepo    _interface.LogisticCostRepo
 }
 
-func NewTransactionUseCase(transactionRepo repo.TransactionRepository, productRepo repo.ProductRepository, orderRepo repo.OrderRepository, logisticRepo repo.LogisticCostRepo) TransactionUseCase {
+func NewTransactionUseCase(transactionRepo _interface.TransactionRepository, productRepo _interface.ProductRepository, orderRepo _interface.OrderRepository, logisticRepo _interface.LogisticCostRepo) _interface2.TransactionUseCase {
 	return &transactionUseCaseImpl{transactionRepo, productRepo, orderRepo, logisticRepo}
 }
 

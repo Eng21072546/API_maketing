@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
+	"github.com/Eng21072546/API_maketing/useCase/interface"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -17,7 +18,7 @@ import (
 )
 
 type mockTransaction struct {
-	useCase      TransactionUseCase
+	useCase      _interface.TransactionUseCase
 	repo         *mockRepository.MockTransactionRepo
 	productRepo  *mockRepository.MockProductRepo
 	orderRepo    *mockRepository.MockOrderRepo

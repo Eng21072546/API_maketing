@@ -5,16 +5,17 @@ import (
 	"errors"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/repo"
+	"github.com/Eng21072546/API_maketing/repo/interface"
+	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
 )
 
 type OrderUseCaseImpl struct {
-	orderRepo       repo.OrderRepository
-	productRepo     repo.ProductRepository
-	transactionRepo repo.TransactionRepository
+	orderRepo       _interface.OrderRepository
+	productRepo     _interface.ProductRepository
+	transactionRepo _interface.TransactionRepository
 }
 
-func NewOrderUseCase(orderRepo repo.OrderRepository, productRepo repo.ProductRepository, transactionRepo repo.TransactionRepository) OrderUseCase {
+func NewOrderUseCase(orderRepo _interface.OrderRepository, productRepo _interface.ProductRepository, transactionRepo _interface.TransactionRepository) _interface2.OrderUseCase {
 	return &OrderUseCaseImpl{orderRepo: orderRepo, productRepo: productRepo, transactionRepo: transactionRepo}
 }
 
