@@ -5,7 +5,6 @@ import (
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/stretchr/testify/mock"
-	"time"
 )
 
 type MockTransactionRepo struct {
@@ -20,14 +19,4 @@ func (t *MockTransactionRepo) InsertTransaction(ctx context.Context, transaction
 func (t *MockTransactionRepo) FindTransaction(ctx context.Context, id string) (*entity.Transaction, error) {
 	args := t.Called(ctx, id)
 	return args.Get(0).(*entity.Transaction), args.Error(1)
-}
-
-func (t *MockTransactionRepo) SetTime() time.Time {
-	args := t.Called()
-	return args.Get(0).(time.Time)
-}
-
-func (t *MockTransactionRepo) SetId() string {
-	args := t.Called()
-	return args.String(0)
 }
