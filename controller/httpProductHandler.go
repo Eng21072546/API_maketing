@@ -82,7 +82,7 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 		log.Error("Product cannot createProduct", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
 	}
-	log.Info("Created product", zap.String("ProductId", string(product.ID)))
+	log.Info("Created product", zap.Any("product", product.ID))
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"Product": product})
 }
 

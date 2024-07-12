@@ -1,0 +1,5 @@
+{"level":"info","ts":1720720018.2360206,"caller":"controller/httpProductHandler.go:90","msg":"Created product","ProductId":"빗"}
+{"level":"info","ts":1720720030.3013558,"caller":"controller/httpProductHandler.go:90","msg":"Created product","ProductId":"𕧰"}
+{"level":"info","ts":1720720991.2341337,"caller":"controller/httpProductHandler.go:90","msg":"Created product","ProductId":"롛"}
+{"level":"info","ts":1720764969.8552475,"caller":"controller/httpProductHandler.go:93","msg":"Created product","ProductId":"啄"}
+{"level":"info","ts":1720769259.9754014,"caller":"controller/httpProductHandler.go:85","msg":"Created product","product":40429}
