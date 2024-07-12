@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/Eng21072546/API_maketing/controller/validatePayload"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/logger"
 	"github.com/Eng21072546/API_maketing/payload"
@@ -36,10 +37,15 @@ func (t *HttpTransactionHandler) PostTransaction(c *fiber.Ctx) error {
 	defer logCancel()
 	transPayload := new(payload.Transaction)
 	err := c.BodyParser(transPayload)
-	if err != nil || transPayload.Address == "" || transPayload.ProductOrder == nil {
+	if err != nil {
 		log.Error("Invalid transaction req", zap.Error(err))
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errors.New("invalid request body must have address and product order")})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errors.New("invalid request")})
 	}
+	err = validatePayload.Validate(transPayload)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "Invalid request body must have address and product order"})
+	}
+
 	transaction := entity.NewTransaction(transPayload.Address, transPayload.ProductOrder)
 	transaction, errList := t.transactionUseCase.NewTransaction(c.Context(), transaction)
 	if errList != nil && len(errList) != 0 {

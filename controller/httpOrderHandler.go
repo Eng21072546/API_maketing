@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/Eng21072546/API_maketing/controller/validatePayload"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/logger"
 	"github.com/Eng21072546/API_maketing/payload"
@@ -36,17 +37,21 @@ func (h *HttpOrderHandler) CreateOrder(c *fiber.Ctx) error {
 	logger, loggerClose := h.newOrderHandlerLog()
 	defer loggerClose()
 
-	var orderReq payload.Order
-	if err := c.BodyParser(&orderReq); err != nil || orderReq.TransactionId == "" || orderReq.CustomerName == "" {
+	var orderPayload payload.Order
+	if err := c.BodyParser(&orderPayload); err != nil {
 		logger.Warn("Invalid user_name or transaction_id", zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errors.New("Invalid request body mush have customerName and transaction")})
 	}
-	orderEntity := entity.Order{CustomerName: orderReq.CustomerName, TransactionId: orderReq.TransactionId}
+	err := validatePayload.Validate(orderPayload)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "Invalid Request"})
+	}
+	orderEntity := entity.Order{CustomerName: orderPayload.CustomerName, TransactionId: orderPayload.TransactionId}
 
-	order, err := h.orderUseCase.NewOrder(c.Context(), &orderEntity)
-	if len(err) != 0 {
+	order, errList := h.orderUseCase.NewOrder(c.Context(), &orderEntity)
+	if len(errList) != 0 {
 		logger.Error("Cannot CreateNewOrder ")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errorsToStrings(err)})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errorsToStrings(errList)})
 	}
 	logger.Info("CreateNewOrder success", zap.Any("order_id", order.ID))
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"OrderCreate": order})

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"github.com/Eng21072546/API_maketing/controller/validatePayload"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/logger"
 	"github.com/Eng21072546/API_maketing/payload"
@@ -67,12 +68,16 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 	if err := c.BodyParser(&create); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
+	err := validatePayload.Validate(create)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "Invalid Request"})
+	}
 	var product = &entity.Product{
 		Name:  create.Name,
 		Price: create.Price,
 		Stock: create.Stock,
 	}
-	product, err := h.productUseCase.CreateProduct(c.Context(), product)
+	product, err = h.productUseCase.CreateProduct(c.Context(), product)
 	if err != nil {
 		log.Error("Product cannot createProduct", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
@@ -93,9 +98,13 @@ func (h *HttpProductHandler) UpdateProduct(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
-	if err := c.BodyParser(&update); err != nil {
+	if err = c.BodyParser(&update); err != nil {
 		log.Error("Invalid req", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
+	}
+	err = validatePayload.Validate(update)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 	var productUpdate = &entity.ProductUpdate{ID: id, Name: update.Name, Price: update.Price, Stock: update.Stock}
 
