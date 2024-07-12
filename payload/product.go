@@ -1,9 +1,9 @@
 package payload
 
 type ProductCreate struct {
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
-	Stock int     `json:"stock"`
+	Name  string  `json:"name" validate:"required"`
+	Price float64 `json:"price" validate:"required,min=1" `
+	Stock int     `json:"stock" validate:"min=0"`
 }
 
 type ProductUpdate struct {
