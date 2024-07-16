@@ -1,4 +1,4 @@
-package mockUseCase
+package product
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package useCase
+package transaction
 
 import (
 	"context"
@@ -6,18 +6,20 @@ import (
 	"fmt"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/repo/interface"
-	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/repo/logistic"
+	"github.com/Eng21072546/API_maketing/repo/order"
+	"github.com/Eng21072546/API_maketing/repo/product"
+	"github.com/Eng21072546/API_maketing/repo/transaction"
 )
 
 type transactionUseCaseImpl struct {
-	transactionRepo _interface.TransactionRepository
-	productRepo     _interface.ProductRepository
-	orderRepo       _interface.OrderRepository
-	logisticRepo    _interface.LogisticCostRepo
+	transactionRepo transaction.TransactionRepository
+	productRepo     product.ProductRepository
+	orderRepo       order.OrderRepository
+	logisticRepo    logistic.LogisticCostRepo
 }
 
-func NewTransactionUseCase(transactionRepo _interface.TransactionRepository, productRepo _interface.ProductRepository, orderRepo _interface.OrderRepository, logisticRepo _interface.LogisticCostRepo) _interface2.TransactionUseCase {
+func NewTransactionUseCase(transactionRepo transaction.TransactionRepository, productRepo product.ProductRepository, orderRepo order.OrderRepository, logisticRepo logistic.LogisticCostRepo) TransactionUseCase {
 	return &transactionUseCaseImpl{transactionRepo, productRepo, orderRepo, logisticRepo}
 }
 

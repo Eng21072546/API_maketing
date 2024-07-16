@@ -1,11 +1,14 @@
-package useCase
+package order
 
 import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/useCase/interface"
-	"github.com/Eng21072546/API_maketing/useCase/mockRepository"
+	"github.com/Eng21072546/API_maketing/repo"
+	"github.com/Eng21072546/API_maketing/repo/logistic"
+	"github.com/Eng21072546/API_maketing/repo/order"
+	"github.com/Eng21072546/API_maketing/repo/product"
+	"github.com/Eng21072546/API_maketing/repo/transaction"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -15,15 +18,15 @@ import (
 )
 
 type mockOrder struct {
-	useCase         _interface.OrderUseCase
-	repo            *mockRepository.MockOrderRepo
-	productRepo     *mockRepository.MockProductRepo
-	transactionRepo *mockRepository.MockTransactionRepo
-	logisticRepo    *mockRepository.MockLogisticRepo
+	useCase         OrderUseCase
+	repo            *order.MockOrderRepo
+	productRepo     *product.MockProductRepo
+	transactionRepo *transaction.MockTransactionRepo
+	logisticRepo    *logistic.MockLogisticRepo
 }
 
 func setupOrderTest() mockOrder {
-	pd, tx, or, lo := mockRepository.NewMockRepository()
+	pd, tx, or, lo := repo.NewMockRepository()
 	useCase := NewOrderUseCase(or, pd, tx)
 	return mockOrder{useCase, or, pd, tx, lo}
 }

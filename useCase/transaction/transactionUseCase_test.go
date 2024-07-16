@@ -1,14 +1,16 @@
-package useCase
+package transaction
 
 import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/repo"
+	"github.com/Eng21072546/API_maketing/repo/logistic"
+	"github.com/Eng21072546/API_maketing/repo/order"
+	"github.com/Eng21072546/API_maketing/repo/product"
+	"github.com/Eng21072546/API_maketing/repo/transaction"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/Eng21072546/API_maketing/useCase/mockRepository"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,15 +20,15 @@ import (
 )
 
 type mockTransaction struct {
-	useCase      _interface.TransactionUseCase
-	repo         *mockRepository.MockTransactionRepo
-	productRepo  *mockRepository.MockProductRepo
-	orderRepo    *mockRepository.MockOrderRepo
-	logisticRepo *mockRepository.MockLogisticRepo
+	useCase      TransactionUseCase
+	repo         *transaction.MockTransactionRepo
+	productRepo  *product.MockProductRepo
+	orderRepo    *order.MockOrderRepo
+	logisticRepo *logistic.MockLogisticRepo
 }
 
 func setupTransactionTest() mockTransaction {
-	pd, tx, or, lo := mockRepository.NewMockRepository()
+	pd, tx, or, lo := repo.NewMockRepository()
 	useCase := NewTransactionUseCase(tx, pd, or, lo)
 	return mockTransaction{
 		useCase:      useCase,

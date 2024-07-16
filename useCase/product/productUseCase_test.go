@@ -1,11 +1,10 @@
-package useCase
+package product
 
 import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/useCase/interface"
-	"github.com/Eng21072546/API_maketing/useCase/mockRepository"
+	"github.com/Eng21072546/API_maketing/repo/product"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,12 +17,12 @@ type mockRepo struct {
 }
 
 type mockProductUseCase struct {
-	mockProductRepo *mockRepository.MockProductRepo
-	productUseCase  _interface.ProductUseCase
+	mockProductRepo *product.MockProductRepo
+	productUseCase  ProductUseCase
 }
 
 func setupProductUseCase() mockProductUseCase {
-	repo := new(mockRepository.MockProductRepo)
+	repo := new(product.MockProductRepo)
 	useCase := NewProductUseCase(repo)
 	return mockProductUseCase{repo, useCase}
 }

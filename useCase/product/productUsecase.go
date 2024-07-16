@@ -1,10 +1,9 @@
-package useCase
+package product
 
 import (
 	"context"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/repo/interface"
-	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/repo/product"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.opentelemetry.io/otel"
@@ -16,10 +15,10 @@ var (
 )
 
 type ProductUseCaseImpl struct {
-	repo _interface.ProductRepository
+	repo product.ProductRepository
 }
 
-func NewProductUseCase(repo _interface.ProductRepository) _interface2.ProductUseCase {
+func NewProductUseCase(repo product.ProductRepository) ProductUseCase {
 	return &ProductUseCaseImpl{repo: repo}
 }
 

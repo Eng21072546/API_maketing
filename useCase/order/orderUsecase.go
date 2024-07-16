@@ -1,21 +1,22 @@
-package useCase
+package order
 
 import (
 	"context"
 	"errors"
 	"github.com/Eng21072546/API_maketing/collection"
 	"github.com/Eng21072546/API_maketing/entity"
-	"github.com/Eng21072546/API_maketing/repo/interface"
-	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/repo/order"
+	"github.com/Eng21072546/API_maketing/repo/product"
+	"github.com/Eng21072546/API_maketing/repo/transaction"
 )
 
 type OrderUseCaseImpl struct {
-	orderRepo       _interface.OrderRepository
-	productRepo     _interface.ProductRepository
-	transactionRepo _interface.TransactionRepository
+	orderRepo       order.OrderRepository
+	productRepo     product.ProductRepository
+	transactionRepo transaction.TransactionRepository
 }
 
-func NewOrderUseCase(orderRepo _interface.OrderRepository, productRepo _interface.ProductRepository, transactionRepo _interface.TransactionRepository) _interface2.OrderUseCase {
+func NewOrderUseCase(orderRepo order.OrderRepository, productRepo product.ProductRepository, transactionRepo transaction.TransactionRepository) OrderUseCase {
 	return &OrderUseCaseImpl{orderRepo: orderRepo, productRepo: productRepo, transactionRepo: transactionRepo}
 }
 

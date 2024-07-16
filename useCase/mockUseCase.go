@@ -1,4 +1,4 @@
-package mockUseCase
+package useCase
 
 import (
 	"github.com/Eng21072546/API_maketing/useCase/order"
