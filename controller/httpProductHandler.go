@@ -8,8 +8,15 @@ import (
 	"github.com/Eng21072546/API_maketing/payload"
 	"github.com/Eng21072546/API_maketing/useCase/interface"
 	"github.com/gofiber/fiber/v2"
+	"go.opentelemetry.io/otel"
+
 	"go.uber.org/zap"
 	"os"
+)
+
+var (
+	name   = "productController"
+	tracer = otel.GetTracerProvider().Tracer(name)
 )
 
 type HttpProductHandler struct {
@@ -34,14 +41,22 @@ func (h *HttpProductHandler) newProductHandlerLog() (*zap.Logger, func()) {
 }
 
 func (h *HttpProductHandler) GetAllProducts(c *fiber.Ctx) error {
+	ctx, span := tracer.Start(c.Context(), "GetAllProducts")
+	defer span.End()
+	log, logClose := h.newProductHandlerLog()
+	defer logClose()
+	log.Info("GetProductAllProducts", zap.String("url", c.OriginalURL()))
 	fmt.Println("productUseCase")
-	products, err := h.productUseCase.GetAllProduct(c.Context())
+	products, err := h.productUseCase.GetAllProduct(ctx)
 	if err != nil {
+		log.Error("GetProductAllProducts Error", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
 	}
 	return c.JSON(fiber.Map{"Products": products})
 }
 func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
+	ctx, span := tracer.Start(c.Context(), "GetProductById")
+	defer span.End()
 	log, logClose := h.newProductHandlerLog()
 	defer logClose()
 
@@ -53,7 +68,7 @@ func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Invalid Request"})
 	}
 
-	product, err := h.productUseCase.GetProduct(c.Context(), id)
+	product, err := h.productUseCase.GetProduct(ctx, id)
 	if err != nil {
 		log.Error("Product not found", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Product Not Found"})
@@ -61,6 +76,8 @@ func (h *HttpProductHandler) GetProductById(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"Product": product})
 }
 func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
+	ctx, span := tracer.Start(c.Context(), "CreateProduct")
+	defer span.End()
 	log, logClose := h.newProductHandlerLog()
 	defer logClose()
 
@@ -77,7 +94,7 @@ func (h *HttpProductHandler) CreateProduct(c *fiber.Ctx) error {
 		Price: create.Price,
 		Stock: create.Stock,
 	}
-	product, err = h.productUseCase.CreateProduct(c.Context(), product)
+	product, err = h.productUseCase.CreateProduct(ctx, product)
 	if err != nil {
 		log.Error("Product cannot createProduct", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": "Server Error"})
