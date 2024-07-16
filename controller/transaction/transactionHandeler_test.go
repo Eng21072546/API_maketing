@@ -1,11 +1,11 @@
-package controller
+package transaction
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/Eng21072546/API_maketing/controller/mockUseCase"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/payload"
+	"github.com/Eng21072546/API_maketing/useCase/transaction"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,8 +14,8 @@ import (
 	"testing"
 )
 
-func SetupMockTransaction() (*mockUseCase.MockTransactionUseCase, *HttpTransactionHandler) {
-	mockTransactionUseCase := new(mockUseCase.MockTransactionUseCase)
+func SetupMockTransaction() (*transaction.MockTransactionUseCase, *HttpTransactionHandler) {
+	mockTransactionUseCase := new(transaction.MockTransactionUseCase)
 	transactionHandler := NewHttpTransactionHandler(mockTransactionUseCase)
 	return mockTransactionUseCase, transactionHandler
 }

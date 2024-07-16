@@ -1,20 +1,21 @@
-package controller
+package transaction
 
 import (
 	"errors"
 	"fmt"
+	"github.com/Eng21072546/API_maketing/controller"
 	"github.com/Eng21072546/API_maketing/controller/validatePayload"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/logger"
 	"github.com/Eng21072546/API_maketing/payload"
-	"github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/useCase/transaction"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"os"
 )
 
 type HttpTransactionHandler struct {
-	transactionUseCase _interface.TransactionUseCase
+	transactionUseCase transaction.TransactionUseCase
 }
 
 func (t *HttpTransactionHandler) newTransactionHandlerLog() (*zap.Logger, func()) {
@@ -28,7 +29,7 @@ func (t *HttpTransactionHandler) newTransactionHandlerLog() (*zap.Logger, func()
 	return logger, loggerClose
 }
 
-func NewHttpTransactionHandler(transactionUseCase _interface.TransactionUseCase) *HttpTransactionHandler {
+func NewHttpTransactionHandler(transactionUseCase transaction.TransactionUseCase) *HttpTransactionHandler {
 	return &HttpTransactionHandler{transactionUseCase: transactionUseCase}
 }
 
@@ -50,7 +51,7 @@ func (t *HttpTransactionHandler) PostTransaction(c *fiber.Ctx) error {
 	transaction, errList := t.transactionUseCase.NewTransaction(c.Context(), transaction)
 	if errList != nil && len(errList) != 0 {
 		log.Error("Transaction creation error", zap.Error(errList[0]))
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": errorsToStrings(errList)})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": controller.errorsToStrings(errList)})
 	}
 	log.Info("transaction created", zap.String("transaction_id", transaction.ID))
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"transaction": transaction})

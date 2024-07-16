@@ -1,12 +1,12 @@
-package controller
+package product
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/Eng21072546/API_maketing/controller/mockUseCase"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/payload"
+	"github.com/Eng21072546/API_maketing/useCase/product"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +17,7 @@ import (
 )
 
 func TestNewHttpProductHandler(t *testing.T) {
-	mockProductUseCase := new(mockUseCase.MockProductUseCase)
+	mockProductUseCase := new(product.MockProductUseCase)
 	productHandler := NewHttpProductHandler(mockProductUseCase)
 
 	app := fiber.New()

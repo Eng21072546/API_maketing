@@ -1,13 +1,14 @@
-package controller
+package order
 
 import (
 	"errors"
 	"fmt"
+	"github.com/Eng21072546/API_maketing/controller"
 	"github.com/Eng21072546/API_maketing/controller/validatePayload"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/logger"
 	"github.com/Eng21072546/API_maketing/payload"
-	"github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/useCase/order"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"net/http"
@@ -26,10 +27,10 @@ func (h HttpOrderHandler) newOrderHandlerLog() (*zap.Logger, func()) {
 }
 
 type HttpOrderHandler struct {
-	orderUseCase _interface.OrderUseCase
+	orderUseCase order.OrderUseCase
 }
 
-func NewHttpOrderHandler(userUseCase _interface.OrderUseCase) *HttpOrderHandler {
+func NewHttpOrderHandler(userUseCase order.OrderUseCase) *HttpOrderHandler {
 	return &HttpOrderHandler{orderUseCase: userUseCase}
 }
 
@@ -51,7 +52,7 @@ func (h *HttpOrderHandler) CreateOrder(c *fiber.Ctx) error {
 	order, errList := h.orderUseCase.NewOrder(c.Context(), &orderEntity)
 	if len(errList) != 0 {
 		logger.Error("Cannot CreateNewOrder ")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": errorsToStrings(errList)})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": controller.ErrorsToStrings(errList)})
 	}
 	logger.Info("CreateNewOrder success", zap.Any("order_id", order.ID))
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"OrderCreate": order})

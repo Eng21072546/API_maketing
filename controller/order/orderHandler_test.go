@@ -1,12 +1,12 @@
-package controller
+package order
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/Eng21072546/API_maketing/controller/mockUseCase"
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/payload"
+	"github.com/Eng21072546/API_maketing/useCase/order"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -17,8 +17,8 @@ import (
 	"time"
 )
 
-func setupMockOrder() (*mockUseCase.MockOrderUseCase, *HttpOrderHandler) {
-	mockOrderUseCase := &mockUseCase.MockOrderUseCase{}
+func setupMockOrder() (*order.MockOrderUseCase, *HttpOrderHandler) {
+	mockOrderUseCase := &order.MockOrderUseCase{}
 	orderHandler := NewHttpOrderHandler(mockOrderUseCase)
 	return mockOrderUseCase, orderHandler
 }

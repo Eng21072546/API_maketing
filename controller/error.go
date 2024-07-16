@@ -1,6 +1,6 @@
 package controller
 
-func errorsToStrings(errs []error) []string {
+func ErrorsToStrings(errs []error) []string {
 	errorMessages := make([]string, len(errs))
 	for i, err := range errs {
 		errorMessages[i] = err.Error()

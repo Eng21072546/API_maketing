@@ -7,6 +7,12 @@ import (
 	_interface2 "github.com/Eng21072546/API_maketing/useCase/interface"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.opentelemetry.io/otel"
+)
+
+var (
+	name   = "productUseCase"
+	tracer = otel.GetTracerProvider().Tracer(name)
 )
 
 type ProductUseCaseImpl struct {
@@ -18,6 +24,8 @@ func NewProductUseCase(repo _interface.ProductRepository) _interface2.ProductUse
 }
 
 func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
+	ctx, span := tracer.Start(ctx, "CreateProduct")
+	defer span.End()
 	result, err := p.repo.InsertProduct(ctx, product)
 	if err != nil {
 		return nil, err
@@ -26,10 +34,14 @@ func (p *ProductUseCaseImpl) CreateProduct(ctx context.Context, product *entity.
 }
 
 func (p *ProductUseCaseImpl) GetProduct(ctx context.Context, id int) (*entity.Product, error) {
+	ctx, span := tracer.Start(ctx, "GetProduct")
+	defer span.End()
 	return p.repo.FindProductById(ctx, id)
 }
 
 func (p *ProductUseCaseImpl) GetAllProduct(ctx context.Context) (*[]entity.Product, error) {
+	ctx, span := tracer.Start(ctx, "GetAllProduct")
+	defer span.End()
 	return p.repo.FindAllProducts(ctx)
 }
 

@@ -1,4 +1,4 @@
-package controller
+package product
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/Eng21072546/API_maketing/entity"
 	"github.com/Eng21072546/API_maketing/logger"
 	"github.com/Eng21072546/API_maketing/payload"
-	"github.com/Eng21072546/API_maketing/useCase/interface"
+	"github.com/Eng21072546/API_maketing/useCase/product"
 	"github.com/gofiber/fiber/v2"
 	"go.opentelemetry.io/otel"
 
@@ -20,10 +20,10 @@ var (
 )
 
 type HttpProductHandler struct {
-	productUseCase _interface.ProductUseCase
+	productUseCase product.ProductUseCase
 }
 
-func NewHttpProductHandler(ProductUseCase _interface.ProductUseCase) *HttpProductHandler {
+func NewHttpProductHandler(ProductUseCase product.ProductUseCase) *HttpProductHandler {
 	return &HttpProductHandler{productUseCase: ProductUseCase}
 }
 
