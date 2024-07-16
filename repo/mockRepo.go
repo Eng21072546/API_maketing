@@ -1,4 +1,4 @@
-package mockRepository
+package repo
 
 import (
 	"github.com/Eng21072546/API_maketing/repo/logistic"

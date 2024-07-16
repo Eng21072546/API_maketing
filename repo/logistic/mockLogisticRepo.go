@@ -1,4 +1,4 @@
-package mockRepository
+package logistic
 
 import (
 	"context"

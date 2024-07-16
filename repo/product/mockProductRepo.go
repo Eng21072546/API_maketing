@@ -1,4 +1,4 @@
-package mockRepository
+package product
 
 import (
 	"context"

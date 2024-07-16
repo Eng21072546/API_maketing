@@ -1,4 +1,4 @@
-package repo
+package transaction
 
 import (
 	"context"

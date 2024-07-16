@@ -1,4 +1,4 @@
-package _interface
+package transaction
 
 import (
 	"context"
