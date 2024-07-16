@@ -6,8 +6,14 @@ import (
 	"github.com/Eng21072546/API_maketing/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.opentelemetry.io/otel"
 	"math/rand"
 	"time"
+)
+
+var (
+	name   = "productRepo"
+	tracer = otel.GetTracerProvider().Tracer(name)
 )
 
 type MongoProductRepository struct {
@@ -20,6 +26,8 @@ func NewMongoProductRepository(client *mongo.Client, ctx context.Context) *Mongo
 }
 
 func (m *MongoProductRepository) InsertProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
+	_, span := tracer.Start(ctx, "InsertProductUseCase")
+	defer span.End()
 	product.ID = m.setID()
 	_, err := m.client.Database("market").Collection("product").InsertOne(ctx, product)
 	if err != nil {
@@ -33,6 +41,8 @@ func (m *MongoProductRepository) InsertProduct(ctx context.Context, product *ent
 }
 
 func (m *MongoProductRepository) FindProductById(ctx context.Context, id int) (*entity.Product, error) {
+	_, span := tracer.Start(ctx, "FindProductUseCase")
+	defer span.End()
 	var product entity.Product
 	err := m.client.Database("market").Collection("product").FindOne(m.ctxMongo, bson.M{"id": id}).Decode(&product)
 	if err != nil {
@@ -42,6 +52,8 @@ func (m *MongoProductRepository) FindProductById(ctx context.Context, id int) (*
 }
 
 func (m *MongoProductRepository) UpdateProduct(ctx context.Context, id int, updateDocument bson.M) (*mongo.UpdateResult, error) {
+	_, span := tracer.Start(ctx, "UpdateProductUseCase")
+	defer span.End()
 	filter := bson.M{"id": id}
 	update := bson.M{"$set": updateDocument}
 	updateResult, err := m.client.Database("market").Collection("product").UpdateOne(m.ctxMongo, filter, update)
@@ -52,6 +64,8 @@ func (m *MongoProductRepository) UpdateProduct(ctx context.Context, id int, upda
 }
 
 func (m *MongoProductRepository) FindAllProducts(ctx context.Context) (*[]entity.Product, error) {
+	_, span := tracer.Start(ctx, "findAllProductsUseCase")
+	defer span.End()
 	var products []entity.Product
 	cursor, err := m.client.Database("market").Collection("product").Find(m.ctxMongo, bson.M{})
 	if err != nil {
@@ -64,6 +78,8 @@ func (m *MongoProductRepository) FindAllProducts(ctx context.Context) (*[]entity
 }
 
 func (m *MongoProductRepository) DeleteProductById(ctx context.Context, id int) (*mongo.DeleteResult, error) {
+	_, span := tracer.Start(ctx, "deleteProductUseCase")
+	defer span.End()
 	filter := bson.M{"id": id}
 	result, err := m.client.Database("market").Collection("product").DeleteOne(m.ctxMongo, filter)
 	if err != nil {
@@ -73,7 +89,8 @@ func (m *MongoProductRepository) DeleteProductById(ctx context.Context, id int) 
 }
 
 func (m *MongoProductRepository) DecreaseStock(ctx context.Context, productOrder []entity.ProductOrder) error {
-
+	_, span := tracer.Start(ctx, "decreaseStockUseCase")
+	defer span.End()
 	for _, productOrder := range productOrder {
 		product, _ := m.FindProductById(ctx, productOrder.ProductID)
 		currenStock := product.Stock
@@ -87,6 +104,8 @@ func (m *MongoProductRepository) DecreaseStock(ctx context.Context, productOrder
 }
 
 func (m *MongoProductRepository) UpdateStock(ctx context.Context, productID int, quantity int) error {
+	_, span := tracer.Start(ctx, "updateStockUseCase")
+	defer span.End()
 	filter := bson.M{"id": productID}
 	update := bson.M{"$set": bson.M{"stock": quantity}}
 	_, err := m.client.Database("market").Collection("product").UpdateOne(ctx, filter, update)
@@ -97,6 +116,8 @@ func (m *MongoProductRepository) UpdateStock(ctx context.Context, productID int,
 }
 
 func (m *MongoProductRepository) CheckStock(ctx context.Context, productID int, quantity int) error {
+	_, span := tracer.Start(ctx, "checkStockUseCase")
+	defer span.End()
 	if quantity == 0 {
 		return nil
 	}

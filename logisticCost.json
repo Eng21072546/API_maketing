@@ -1,0 +1,14 @@
+[
+  {
+    "address": "international",
+    "cost": 100
+  },
+  {
+    "address": "domestic",
+    "cost": 50
+  },
+  {
+    "address": "local",
+    "cost": 25
+  }
+]
